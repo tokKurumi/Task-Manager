@@ -1,4 +1,10 @@
 <Solution>
   <Project Path="Task Manager.AppHost/Task Manager.AppHost.csproj" />
+  <Project Path="Task Manager.Application/Task Manager.Application.csproj" />
+  <Project Path="Task Manager.Client/Task Manager.Client.csproj" />
+  <Project Path="Task Manager.Core/Task Manager.Core.csproj" />
+  <Project Path="Task Manager.Infrastructure/Task Manager.Infrastructure.csproj" />
   <Project Path="Task Manager.ServiceDefaults/Task Manager.ServiceDefaults.csproj" />
+  <Project Path="Task Manager.Tests/Task Manager.Tests.csproj" />
+  <Project Path="Task Manager.WebAPI/Task Manager.WebAPI.csproj" />
 </Solution>
