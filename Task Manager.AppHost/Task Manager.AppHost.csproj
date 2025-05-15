@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Task Manager.Client\Task Manager.Client.csproj" />
-    <ProjectReference Include="..\Task Manager.WebAPI\Task Manager.WebAPI.csproj" />
+    <ProjectReference Include="..\Task Manager.TaskAPI\Task Manager.TaskAPI.csproj" />
   </ItemGroup>
 
 </Project>

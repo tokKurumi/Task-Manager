@@ -4,7 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>Task_Manager.WebAPI</RootNamespace>
+    <RootNamespace>Task_Manager.TaskAPI</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
