@@ -11,12 +11,15 @@ public enum TaskStatus
 
 public class TaskItem
 {
+    private readonly List<TaskComment> _comments = [];
+
     public Guid Id { get; init; }
     public User Author { get; init; }
     public string Title { get; private set; }
     public string Description { get; private set; }
     public TaskStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; init; }
+    public IReadOnlyCollection<TaskComment> Comments => _comments.AsReadOnly();
 
     private TaskItem(User author, string title, string description, DateTimeOffset createdAt)
     {
@@ -42,6 +45,20 @@ public class TaskItem
 
         return Result<TaskItem, TaskItemError>.Success(new TaskItem(author, title, description, timeProvider.GetUtcNow()));
     }
+
+    public Result<TaskComment, TaskItemError> TryAddComment(User author, string message, TimeProvider timeProvider)
+    {
+        var commentResult = TaskComment.TryCreate(author, message, timeProvider);
+        if (commentResult.IsFailure)
+        {
+            return Result<TaskComment, TaskItemError>.Failure(new CommentError(commentResult.Error!));
+        }
+
+        var comment = commentResult.Value!;
+        _comments.Add(comment);
+
+        return Result<TaskComment, TaskItemError>.Success(comment);
+    }
 }
 
 public abstract record TaskItemError(string Code) : Error(Code);
@@ -49,3 +66,5 @@ public abstract record TaskItemError(string Code) : Error(Code);
 public sealed record EmptyTitleError() : TaskItemError("EmptyTitle");
 
 public sealed record EmptyDescriptionError() : TaskItemError("EmptyDescription");
+
+public sealed record CommentError(TaskCommentError InnerError) : TaskItemError($"Comment.{InnerError.Code}");
