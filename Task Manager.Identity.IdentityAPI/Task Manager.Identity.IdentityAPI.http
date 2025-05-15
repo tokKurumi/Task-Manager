@@ -1,0 +1,6 @@
+@Task_Manager.Identity.IdentityAPI_HostAddress = http://localhost:5246
+
+GET {{Task_Manager.Identity.IdentityAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

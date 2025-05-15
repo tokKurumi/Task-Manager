@@ -1,6 +1,6 @@
 ﻿using Task_Manager.Common;
 
-namespace Task_Manager.Core.Entities;
+namespace Task_Manager.Task.Core.Entities;
 
 public enum TaskStatus
 {

@@ -1,4 +1,4 @@
-namespace Task_Manager.Task.TaskAPI;
+namespace Task_Manager.Identity.IdentityAPI;
 
 public class WeatherForecast
 {

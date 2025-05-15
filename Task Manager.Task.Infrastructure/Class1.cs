@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Infrastructure;
+﻿namespace Task_Manager.Task.Infrastructure;
 
 public class Class1
 {

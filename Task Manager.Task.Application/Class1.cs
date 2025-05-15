@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Application;
+﻿namespace Task_Manager.Task.Application;
 
 public class Class1
 {

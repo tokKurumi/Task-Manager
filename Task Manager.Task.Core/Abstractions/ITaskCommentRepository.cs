@@ -1,7 +1,7 @@
 ﻿using Task_Manager.Common;
-using Task_Manager.Core.Entities;
+using Task_Manager.Task.Core.Entities;
 
-namespace Task_Manager.Core.Abstractions;
+namespace Task_Manager.Task.Core.Abstractions;
 
 public interface ITaskCommentRepository
 {

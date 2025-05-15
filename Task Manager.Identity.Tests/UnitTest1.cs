@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Task.Tests;
+﻿namespace Task_Manager.Identity.Tests;
 
 public class Tests
 {
