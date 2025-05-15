@@ -22,12 +22,13 @@ public class AuthService(
 
     public async Task<Result<LoginUserResponse, AuthError>> LoginAsync(LoginUserRequest request, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
-        if (user is null)
+        var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
+        if (userFindResult is null)
         {
             return Result<LoginUserResponse, AuthError>.Failure(new UserNotFoundError(request.Email));
         }
 
+        var user = userFindResult.Value!;
         var passwordValid = _passwordService.VerifyHashedPassword(user.PasswordHash, request.Password);
         if (!passwordValid)
         {
@@ -45,8 +46,8 @@ public class AuthService(
 
     public async Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
     {
-        var existingUser = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
-        if (existingUser is not null)
+        var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
+        if (userFindResult is not null)
         {
             return Result<RegisterUserResponse, AuthError>.Failure(new UserAlreadyExistError(request.Email));
         }
