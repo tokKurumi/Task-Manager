@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Task Manager.Client\Task Manager.Client.csproj" />
-    <ProjectReference Include="..\Task Manager.TaskAPI\Task Manager.TaskAPI.csproj" />
+    <ProjectReference Include="..\Task Manager.Task.Client\Task Manager.Task.Client.csproj" />
+    <ProjectReference Include="..\Task Manager.Task.TaskAPI\Task Manager.Task.TaskAPI.csproj" />
   </ItemGroup>
 
 </Project>

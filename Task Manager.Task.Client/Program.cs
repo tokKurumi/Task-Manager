@@ -1,5 +1,5 @@
-using Task_Manager.Client.Components;
 using Task_Manager.ServiceDefaults;
+using Task_Manager.Task.Client.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

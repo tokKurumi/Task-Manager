@@ -2,9 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>Task_Manager.Infrastructure</RootNamespace>
+    <RootNamespace>Task_Manager.Task.Core</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Task Manager.Common\Task Manager.Common.csproj" />
+  </ItemGroup>
 
 </Project>

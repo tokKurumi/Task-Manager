@@ -1,11 +1,15 @@
 <Solution>
+  <Folder Name="/Services/" />
+  <Folder Name="/Services/Identity/" />
+  <Folder Name="/Services/Task/">
+    <Project Path="Task Manager.Task.Application/Task Manager.Task.Application.csproj" />
+    <Project Path="Task Manager.Task.Client/Task Manager.Task.Client.csproj" />
+    <Project Path="Task Manager.Task.Core/Task Manager.Task.Core.csproj" />
+    <Project Path="Task Manager.Task.Infrastructure/Task Manager.Task.Infrastructure.csproj" />
+    <Project Path="Task Manager.Task.TaskAPI/Task Manager.Task.TaskAPI.csproj" />
+    <Project Path="Task Manager.Task.Tests/Task Manager.Task.Tests.csproj" />
+  </Folder>
   <Project Path="Task Manager.AppHost/Task Manager.AppHost.csproj" />
-  <Project Path="Task Manager.Application/Task Manager.Application.csproj" />
-  <Project Path="Task Manager.Client/Task Manager.Client.csproj" />
   <Project Path="Task Manager.Common/Task Manager.Common.csproj" />
-  <Project Path="Task Manager.Core/Task Manager.Core.csproj" />
-  <Project Path="Task Manager.Infrastructure/Task Manager.Infrastructure.csproj" />
   <Project Path="Task Manager.ServiceDefaults/Task Manager.ServiceDefaults.csproj" />
-  <Project Path="Task Manager.Tests/Task Manager.Tests.csproj" />
-  <Project Path="Task Manager.TaskAPI/Task Manager.TaskAPI.csproj" />
 </Solution>
