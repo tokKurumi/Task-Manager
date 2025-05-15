@@ -35,7 +35,7 @@ public class User
         return Result<User, UserError>.Success(new User(email, fullName, timeProvider.GetUtcNow()));
     }
 
-    public Result<TaskItem, UserError> TryAddTask(string title, string description, TimeProvider timeProvider)
+    public Result<TaskItem, UserError> TryCreateTask(string title, string description, TimeProvider timeProvider)
     {
         var taskResult = TaskItem.TryCreate(this, title, description, timeProvider);
         if (taskResult.IsFailure)

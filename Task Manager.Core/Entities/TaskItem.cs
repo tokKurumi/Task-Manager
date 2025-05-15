@@ -46,7 +46,7 @@ public class TaskItem
         return Result<TaskItem, TaskItemError>.Success(new TaskItem(author, title, description, timeProvider.GetUtcNow()));
     }
 
-    public Result<TaskComment, TaskItemError> TryAddComment(User author, string message, TimeProvider timeProvider)
+    public Result<TaskComment, TaskItemError> TryCreateComment(User author, string message, TimeProvider timeProvider)
     {
         var commentResult = TaskComment.TryCreate(author, message, timeProvider);
         if (commentResult.IsFailure)
