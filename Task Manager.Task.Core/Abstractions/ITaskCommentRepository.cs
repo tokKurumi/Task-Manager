@@ -7,7 +7,6 @@ public interface ITaskCommentRepository
 {
     Task<Result<TaskComment, TaskCommentRepositoryError>> CreateCommentAsync(TaskComment comment, CancellationToken cancellationToken = default);
     Task<TaskComment?> GetCommentByIdAsync(Guid commentId, CancellationToken cancellationToken = default);
-    Task<bool> DeleteCommentAsync(Guid commentId, CancellationToken cancellationToken = default);
     Task<Page<TaskComment>> GetPageByTaskIdAsync(Guid taskId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 
