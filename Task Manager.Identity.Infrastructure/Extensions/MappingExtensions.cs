@@ -3,9 +3,9 @@ using Task_Manager.Identity.Infrastructure.Mappers;
 
 namespace Task_Manager.Identity.Infrastructure.Extensions;
 
-public static class MappingExtensions
+internal static class MappingExtensions
 {
-    public static IServiceCollection AddInfrastructureMappers(this IServiceCollection services)
+    internal static IServiceCollection AddInfrastructureMappers(this IServiceCollection services)
     {
         return services
             .AddScoped<ApplicationUserMapper>();

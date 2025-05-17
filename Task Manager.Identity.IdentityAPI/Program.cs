@@ -9,7 +9,6 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-builder.Services.AddInfrastructureMappers();
 builder.AddIdentityDbContext();
 
 var app = builder.Build();
