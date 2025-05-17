@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Task Manager.ServiceDefaults\Task Manager.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Task Manager.Identity.Infrastructure\Task Manager.Identity.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
