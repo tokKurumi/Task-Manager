@@ -5,6 +5,7 @@
     <Project Path="Task Manager.Identity.Core/Task Manager.Identity.Core.csproj" />
     <Project Path="Task Manager.Identity.IdentityAPI/Task Manager.Identity.IdentityAPI.csproj" />
     <Project Path="Task Manager.Identity.Infrastructure/Task Manager.Identity.Infrastructure.csproj" />
+    <Project Path="Task Manager.Identity.Migrator/Task Manager.Identity.Migrator.csproj" />
     <Project Path="Task Manager.Identity.Tests/Task Manager.Identity.Tests.csproj" />
   </Folder>
   <Folder Name="/Services/Task/">
