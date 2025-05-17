@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Task Manager.Task.TaskAPI\Task Manager.Task.TaskAPI.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Integrations\Databases\" />
+  </ItemGroup>
+
 </Project>

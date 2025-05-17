@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Task_Manager.AppHost.Integrations;
 using Task_Manager.Identity.Core.Abstractions;
 using Task_Manager.Identity.Core.Entities;
 using Task_Manager.Identity.Infrastructure.Data;
@@ -12,9 +12,9 @@ namespace Task_Manager.Identity.Infrastructure.Extensions;
 
 public static class IdentityServiceExtensions
 {
-    public static IHostApplicationBuilder AddIdentityDbContext(this IHostApplicationBuilder builder, IConfiguration configuration)
+    public static IHostApplicationBuilder AddIdentityDbContext(this IHostApplicationBuilder builder)
     {
-        builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>("identity-postgres"); // TODO: remove this hard-code
+        builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>(Integrations.Identity.PostgreSQLConnectionName);
 
         builder.Services.AddIdentityCore<ApplicationUser>(options =>
         {
