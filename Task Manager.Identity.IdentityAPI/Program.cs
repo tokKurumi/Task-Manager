@@ -1,18 +1,23 @@
+using Scalar.AspNetCore;
 using Task_Manager.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Add services to the container.
+builder.Services.AddOpenApi();
 
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
-// Configure the HTTP request pipeline.
+app.MapDefaultEndpoints();
 
 app.UseHttpsRedirection();
 
