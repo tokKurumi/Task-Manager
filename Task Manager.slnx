@@ -1,11 +1,11 @@
 <Solution>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Identity/">
-    <Project Path="Task Manager.Identity.Application/Task Manager.Identity.Application.csproj" Id="ca86f1ea-dce3-4ae3-8c3f-8d8fb36b6877" />
-    <Project Path="Task Manager.Identity.Core/Task Manager.Identity.Core.csproj" Id="7222386a-ddc7-4975-8eb8-2e345d7914a7" />
+    <Project Path="Task Manager.Identity.Application/Task Manager.Identity.Application.csproj" />
+    <Project Path="Task Manager.Identity.Core/Task Manager.Identity.Core.csproj" />
     <Project Path="Task Manager.Identity.IdentityAPI/Task Manager.Identity.IdentityAPI.csproj" />
-    <Project Path="Task Manager.Identity.Infrastructure/Task Manager.Identity.Infrastructure.csproj" Id="c849e13d-6384-4a8e-ae2b-0b294296b91f" />
-    <Project Path="Task Manager.Identity.Tests/Task Manager.Identity.Tests.csproj" Id="2bb1c699-c5ef-493f-9de0-c156629a0f4d" />
+    <Project Path="Task Manager.Identity.Infrastructure/Task Manager.Identity.Infrastructure.csproj" />
+    <Project Path="Task Manager.Identity.Tests/Task Manager.Identity.Tests.csproj" />
   </Folder>
   <Folder Name="/Services/Task/">
     <Project Path="Task Manager.Task.Application/Task Manager.Task.Application.csproj" />
