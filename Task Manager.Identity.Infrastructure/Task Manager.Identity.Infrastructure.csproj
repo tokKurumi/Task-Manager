@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Task Manager.AppHost\Task Manager.AppHost.csproj" />
+    <ProjectReference Include="..\Task Manager.Integrations\Task Manager.Integrations.csproj" />
     <ProjectReference Include="..\Task Manager.Identity.Application\Task Manager.Identity.Application.csproj" />
   </ItemGroup>
 

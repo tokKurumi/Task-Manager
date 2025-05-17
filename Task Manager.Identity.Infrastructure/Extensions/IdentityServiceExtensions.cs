@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Task_Manager.AppHost.Integrations;
 using Task_Manager.Identity.Core.Abstractions;
 using Task_Manager.Identity.Infrastructure.Data;
 using Task_Manager.Identity.Infrastructure.Entities;

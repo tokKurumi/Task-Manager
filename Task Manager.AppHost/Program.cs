@@ -1,12 +1,12 @@
-using Task_Manager.AppHost.Integrations;
+using Task_Manager.Integrations;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 var identityDatabase = builder
-    .AddPostgres(Integrations.Identity.PostgreSQLResource)
-    .WithDataVolume(Integrations.Identity.PostgreSQLVolume)
+    .AddPostgres(Identity.PostgreSQLResource)
+    .WithDataVolume(Identity.PostgreSQLVolume)
     .WithPgAdmin()
-    .AddDatabase(Integrations.Identity.PostgreSQLDatabase);
+    .AddDatabase(Identity.PostgreSQLDatabase);
 
 var identity = builder
     .AddProject<Projects.Task_Manager_Task_TaskAPI>("task-manager-task-taskapi")
