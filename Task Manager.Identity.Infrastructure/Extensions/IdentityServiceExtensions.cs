@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Task_Manager.AppHost.Integrations;
 using Task_Manager.Identity.Core.Abstractions;
-using Task_Manager.Identity.Core.Entities;
 using Task_Manager.Identity.Infrastructure.Data;
 using Task_Manager.Identity.Infrastructure.Entities;
 using Task_Manager.Identity.Infrastructure.Repositories;
@@ -14,9 +13,11 @@ public static class IdentityServiceExtensions
 {
     public static IHostApplicationBuilder AddIdentityDbContext(this IHostApplicationBuilder builder)
     {
-        builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>(Integrations.Identity.PostgreSQLConnectionName);
+        builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>(Integrations.Identity.PostgreSQLDatabase);
 
-        builder.Services.AddIdentityCore<ApplicationUser>(options =>
+        builder.Services.AddDataProtection();
+
+        builder.Services.AddIdentityCore<UserEntity>(options =>
         {
             options.Password.RequireDigit = true;
             options.Password.RequiredLength = 8;
