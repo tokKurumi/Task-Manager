@@ -1,7 +1,7 @@
 ﻿using Task_Manager.Common;
 using Task_Manager.Identity.Core.Contracts;
 
-namespace Task_Manager.Identity.Core.Abstractions;
+namespace Task_Manager.Identity.Application.Services.Abstractions;
 
 public interface IAuthService
 {
