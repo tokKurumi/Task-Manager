@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services.Abstractions;
+using Task_Manager.Identity.Application.Services.Contracts;
 using Task_Manager.Identity.Infrastructure.Entities;
 
 namespace Task_Manager.Identity.Infrastructure.Services;

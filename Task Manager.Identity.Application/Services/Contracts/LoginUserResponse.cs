@@ -1,6 +1,6 @@
-﻿namespace Task_Manager.Identity.Core.Contracts;
+﻿namespace Task_Manager.Identity.Application.Services.Contracts;
 
-public sealed record RegisterUserResponse(
+public sealed record LoginUserResponse(
     Guid UserId,
     string Token,
     string RefreshToken,

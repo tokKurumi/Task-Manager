@@ -12,8 +12,8 @@ public sealed class LoginUserRequestHandler(
 
     public async ValueTask<Result<LoginUserResponse, AuthError>> Handle(LoginUserRequest request, CancellationToken cancellationToken)
     {
-        var result = await _authService.LoginAsync(LoginUserMapper.ToCore(request), cancellationToken);
+        var result = await _authService.LoginAsync(LoginUserMapper.ToAuthServiceModel(request), cancellationToken);
 
-        return result.Map(LoginUserMapper.ToApplication);
+        return result.Map(LoginUserMapper.ToUseCaseModel);
     }
 }

@@ -1,5 +1,5 @@
 ﻿using Task_Manager.Common;
-using Task_Manager.Identity.Core.Contracts;
+using Task_Manager.Identity.Application.Services.Contracts;
 
 namespace Task_Manager.Identity.Application.Services.Abstractions;
 

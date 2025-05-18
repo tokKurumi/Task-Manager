@@ -12,8 +12,8 @@ public sealed class RegisterUserCommandHandler(
 
     public async ValueTask<Result<RegisterUserResponse, AuthError>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var result = await _authService.RegisterAsync(RegisterUserMapper.ToCore(request), cancellationToken);
+        var result = await _authService.RegisterAsync(RegisterUserMapper.ToAuthServiceModel(request), cancellationToken);
 
-        return result.Map(RegisterUserMapper.ToApplication);
+        return result.Map(RegisterUserMapper.ToUseCaseModel);
     }
 }

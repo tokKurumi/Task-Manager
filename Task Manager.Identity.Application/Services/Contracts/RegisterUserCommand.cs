@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Identity.Core.Contracts;
+﻿namespace Task_Manager.Identity.Application.Services.Contracts;
 
 public sealed record RegisterUserCommand(
     string Email,
