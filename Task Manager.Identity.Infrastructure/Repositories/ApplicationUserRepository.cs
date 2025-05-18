@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Task_Manager.Common;
-using Task_Manager.Identity.Core.Abstractions;
+using Task_Manager.Identity.Application.Services.Abstractions;
 using Task_Manager.Identity.Core.Entities;
 using Task_Manager.Identity.Infrastructure.Entities;
 using IdentityFrameworkError = Microsoft.AspNetCore.Identity.IdentityError;
@@ -16,10 +16,14 @@ public class ApplicationUserRepository(
     private readonly UserManager<UserEntity> _userManager = userManager;
     private readonly TimeProvider _timeProvider = timeProvider;
 
-    public async Task<Result<ApplicationUser, ApplicationUserRepositoryError>> CreateUserAsync(ApplicationUser user, string password, CancellationToken cancellationToken = default)
+    public async Task<Result<ApplicationUser, ApplicationUserRepositoryError>> CreateUserAsync(ApplicationUser user, string passwordHash, CancellationToken cancellationToken = default)
     {
-        var identityUser = new UserEntity(user);
-        var userCreateResult = await _userManager.CreateAsync(identityUser, password);
+        var identityUser = new UserEntity(user)
+        {
+            PasswordHash = passwordHash
+        };
+
+        var userCreateResult = await _userManager.CreateAsync(identityUser);
         if (!userCreateResult.Succeeded)
         {
             return new IdentityError([.. userCreateResult.Errors]);

@@ -8,7 +8,15 @@ public static class DependencyInjection
     public static IHostApplicationBuilder AddApplication(this IHostApplicationBuilder builder)
     {
         return builder
+            .AddServices()
             .AddMediatr();
+    }
+
+    private static IHostApplicationBuilder AddServices(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IAuthService, AuthService>();
+
+        return builder;
     }
 
     private static IHostApplicationBuilder AddMediatr(this IHostApplicationBuilder builder)
