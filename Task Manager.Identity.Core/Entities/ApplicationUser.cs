@@ -41,44 +41,40 @@ public class ApplicationUser
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            return Result<ApplicationUser, ApplicationUserError>.Failure(new EmptyEmailError());
+            return new EmptyEmailError();
         }
 
         if (string.IsNullOrWhiteSpace(displayName))
         {
-            return Result<ApplicationUser, ApplicationUserError>.Failure(new EmptyDisplayNameError());
+            return new EmptyDisplayNameError();
         }
 
         if (string.IsNullOrEmpty(passwordHash))
         {
-            return Result<ApplicationUser, ApplicationUserError>.Failure(new EmptyPasswordHashError());
+            return new EmptyPasswordHashError();
         }
 
-        return Result<ApplicationUser, ApplicationUserError>.Success(
-            new ApplicationUser(email, displayName, passwordHash, timeProvider.GetUtcNow())
-        );
+        return new ApplicationUser(email, displayName, passwordHash, timeProvider.GetUtcNow());
     }
 
     public static Result<ApplicationUser, ApplicationUserError> TryCreate(IUserData userData, TimeProvider timeProvider)
     {
         if (string.IsNullOrWhiteSpace(userData.Email))
         {
-            return Result<ApplicationUser, ApplicationUserError>.Failure(new EmptyEmailError());
+            return new EmptyEmailError();
         }
 
         if (string.IsNullOrWhiteSpace(userData.DisplayName))
         {
-            return Result<ApplicationUser, ApplicationUserError>.Failure(new EmptyDisplayNameError());
+            return new EmptyDisplayNameError();
         }
 
         if (string.IsNullOrEmpty(userData.PasswordHash))
         {
-            return Result<ApplicationUser, ApplicationUserError>.Failure(new EmptyPasswordHashError());
+            return new EmptyPasswordHashError();
         }
 
-        return Result<ApplicationUser, ApplicationUserError>.Success(
-            new ApplicationUser(userData.Id, userData.Email, userData.DisplayName, userData.PasswordHash, userData.CreatedAt)
-        );
+        return new ApplicationUser(userData.Id, userData.Email, userData.DisplayName, userData.PasswordHash, userData.CreatedAt);
     }
 }
 

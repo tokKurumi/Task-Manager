@@ -24,15 +24,15 @@ public class User
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            return Result<User, UserError>.Failure(new EmptyEmailError());
+            return new EmptyEmailError();
         }
 
         if (string.IsNullOrEmpty(fullName))
         {
-            return Result<User, UserError>.Failure(new EmptyFullNameError());
+            return new EmptyFullNameError();
         }
 
-        return Result<User, UserError>.Success(new User(email, fullName, timeProvider.GetUtcNow()));
+        return new User(email, fullName, timeProvider.GetUtcNow());
     }
 
     public Result<TaskItem, UserError> TryCreateTask(string title, string description, TimeProvider timeProvider)
@@ -40,13 +40,13 @@ public class User
         var taskResult = TaskItem.TryCreate(this, title, description, timeProvider);
         if (taskResult.IsFailure)
         {
-            return Result<TaskItem, UserError>.Failure(new UserTaskError(taskResult.Error!));
+            return new UserTaskError(taskResult.Error!);
         }
 
         var task = taskResult.Value!;
         _tasks.Add(task);
 
-        return Result<TaskItem, UserError>.Success(task);
+        return task;
     }
 }
 

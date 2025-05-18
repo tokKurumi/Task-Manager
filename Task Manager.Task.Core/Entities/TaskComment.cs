@@ -21,10 +21,10 @@ public class TaskComment
     {
         if (string.IsNullOrWhiteSpace(message))
         {
-            return Result<TaskComment, TaskCommentError>.Failure(new EmptyMessageError());
+            return new EmptyMessageError();
         }
 
-        return Result<TaskComment, TaskCommentError>.Success(new TaskComment(author, message, timeProvider.GetUtcNow()));
+        return new TaskComment(author, message, timeProvider.GetUtcNow());
     }
 }
 

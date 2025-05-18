@@ -35,15 +35,15 @@ public class TaskItem
     {
         if (string.IsNullOrWhiteSpace(title))
         {
-            return Result<TaskItem, TaskItemError>.Failure(new EmptyTitleError());
+            return new EmptyTitleError();
         }
 
         if (string.IsNullOrWhiteSpace(description))
         {
-            return Result<TaskItem, TaskItemError>.Failure(new EmptyDescriptionError());
+            return new EmptyDescriptionError();
         }
 
-        return Result<TaskItem, TaskItemError>.Success(new TaskItem(author, title, description, timeProvider.GetUtcNow()));
+        return new TaskItem(author, title, description, timeProvider.GetUtcNow());
     }
 
     public Result<TaskComment, TaskItemError> TryCreateComment(User author, string message, TimeProvider timeProvider)
@@ -51,13 +51,13 @@ public class TaskItem
         var commentResult = TaskComment.TryCreate(author, message, timeProvider);
         if (commentResult.IsFailure)
         {
-            return Result<TaskComment, TaskItemError>.Failure(new CommentError(commentResult.Error!));
+            return new CommentError(commentResult.Error!);
         }
 
         var comment = commentResult.Value!;
         _comments.Add(comment);
 
-        return Result<TaskComment, TaskItemError>.Success(comment);
+        return comment;
     }
 }
 

@@ -25,23 +25,21 @@ public class AuthService(
         var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
         if (userFindResult is null)
         {
-            return Result<LoginUserResponse, AuthError>.Failure(new UserNotFoundError(request.Email));
+            return new UserNotFoundError(request.Email);
         }
 
         var user = userFindResult.Value!;
         var passwordValid = _passwordService.VerifyHashedPassword(user.PasswordHash, request.Password);
         if (!passwordValid)
         {
-            return Result<LoginUserResponse, AuthError>.Failure(new InvalidPasswordError(request.Email));
+            return new InvalidPasswordError(request.Email);
         }
 
         var issuedAt = _timeProvider.GetUtcNow();
         var expiresIn = _expiresIn;
         var jwtToken = _jwtTokenGenerator.GenerateToken(user, issuedAt, expiresIn);
 
-        return Result<LoginUserResponse, AuthError>.Success(
-            new LoginUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn)
-        );
+        return new LoginUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn);
     }
 
     public async Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
@@ -49,30 +47,28 @@ public class AuthService(
         var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
         if (userFindResult is not null)
         {
-            return Result<RegisterUserResponse, AuthError>.Failure(new UserAlreadyExistError(request.Email));
+            return new UserAlreadyExistError(request.Email);
         }
 
         var passwordHash = _passwordService.HashPassword(request.Password);
         var userCreateResult = ApplicationUser.TryCreate(request.Email, request.DisplayName, passwordHash, _timeProvider);
         if (userCreateResult.IsFailure)
         {
-            return Result<RegisterUserResponse, AuthError>.Failure(new CreationUserError(userCreateResult.Error!));
+            return new CreationUserError(userCreateResult.Error!);
         }
 
         var user = userCreateResult.Value!;
         var userCreateRepositoryResult = await _userRepository.CreateUserAsync(user, request.Password, cancellationToken);
         if (userCreateRepositoryResult.IsFailure)
         {
-            return Result<RegisterUserResponse, AuthError>.Failure(new RepositoryCreateUserError(userCreateRepositoryResult.Error!));
+            return new RepositoryCreateUserError(userCreateRepositoryResult.Error!);
         }
 
         var issuedAt = _timeProvider.GetUtcNow();
         var expiresIn = _expiresIn;
         var jwtToken = _jwtTokenGenerator.GenerateToken(user, issuedAt, expiresIn);
 
-        return Result<RegisterUserResponse, AuthError>.Success(
-            new RegisterUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn)
-        );
+        return new RegisterUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn);
     }
 }
 

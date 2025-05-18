@@ -22,10 +22,10 @@ public class ApplicationUserRepository(
         var userCreateResult = await _userManager.CreateAsync(identityUser, password);
         if (!userCreateResult.Succeeded)
         {
-            return Result<ApplicationUser, ApplicationUserRepositoryError>.Failure(new IdentityError([.. userCreateResult.Errors]));
+            return new IdentityError([.. userCreateResult.Errors]);
         }
 
-        return Result<ApplicationUser, ApplicationUserRepositoryError>.Success(user);
+        return user;
     }
 
     public async Task<Result<ApplicationUser?, ApplicationUserRepositoryError>> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
@@ -39,10 +39,10 @@ public class ApplicationUserRepository(
         var domainModelMapResult = userMapper.TryMapToDomainModel(identityUser);
         if (domainModelMapResult.IsFailure)
         {
-            return Result<ApplicationUser?, ApplicationUserRepositoryError>.Failure(new InnerDomainError(domainModelMapResult.Error!));
+            return new InnerDomainError(domainModelMapResult.Error!);
         }
 
-        return Result<ApplicationUser?, ApplicationUserRepositoryError>.Success(domainModelMapResult.Value);
+        return domainModelMapResult.Value;
     }
 
     public async Task<Result<ApplicationUser?, ApplicationUserRepositoryError>> FindByIdAsync(Guid userId, CancellationToken cancellationToken = default)
@@ -56,10 +56,10 @@ public class ApplicationUserRepository(
         var domainModelMapResult = userMapper.TryMapToDomainModel(identityUser);
         if (domainModelMapResult.IsFailure)
         {
-            return Result<ApplicationUser?, ApplicationUserRepositoryError>.Failure(new InnerDomainError(domainModelMapResult.Error!));
+            return new InnerDomainError(domainModelMapResult.Error!);
         }
 
-        return Result<ApplicationUser?, ApplicationUserRepositoryError>.Success(domainModelMapResult.Value);
+        return domainModelMapResult.Value;
     }
 
     public async Task<Result<Page<ApplicationUser>, ApplicationUserRepositoryError>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
@@ -74,16 +74,12 @@ public class ApplicationUserRepository(
         var domainModelMapResults = identityUsers.ConvertAll(userMapper.TryMapToDomainModel).ToList();
         if (domainModelMapResults.Any(result => result.IsFailure))
         {
-            return Result<Page<ApplicationUser>, ApplicationUserRepositoryError>.Failure(
-                new InnerDomainErrors([.. domainModelMapResults.Select(result => result.Error!)])
-            );
+            return new InnerDomainErrors([.. domainModelMapResults.Select(result => result.Error!)]);
         }
 
         var domainModels = domainModelMapResults.Select(result => result.Value!).ToList();
 
-        return Result<Page<ApplicationUser>, ApplicationUserRepositoryError>.Success(
-            new Page<ApplicationUser>(domainModels, pageNumber, pageSize, totalCount)
-        );
+        return new Page<ApplicationUser>(domainModels, pageNumber, pageSize, totalCount);
     }
 }
 
