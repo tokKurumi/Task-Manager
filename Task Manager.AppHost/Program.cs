@@ -15,7 +15,7 @@ var identityMigrator = builder
     .WaitFor(identityDatabase);
 
 var identity = builder
-    .AddProject<Projects.Task_Manager_Task_TaskAPI>("task-manager-task-taskapi")
+    .AddProject<Projects.Task_Manager_Identity_IdentityAPI>("task-manager-identity-identityapi")
     .WithReference(identityDatabase)
     .WaitFor(identityDatabase)
     .WaitForCompletion(identityMigrator);
@@ -23,6 +23,6 @@ var identity = builder
 
 builder.AddProject<Projects.Task_Manager_Task_Client>("task-manager-task-client");
 
-builder.AddProject<Projects.Task_Manager_Identity_IdentityAPI>("task-manager-identity-identityapi");
+builder.AddProject<Projects.Task_Manager_Task_TaskAPI>("task-manager-task-taskapi");
 
 builder.Build().Run();
