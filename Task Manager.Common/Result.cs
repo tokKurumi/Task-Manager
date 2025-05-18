@@ -34,8 +34,6 @@ public sealed class Result<TError> : ResultBase<TError>
         => new(false, error);
 
     public static implicit operator Result<TError>(TError error) => Failure(error);
-
-    public static implicit operator bool(Result<TError> result) => result.IsSuccess;
 }
 
 public sealed class Result<T, TError> : ResultBase<TError>
