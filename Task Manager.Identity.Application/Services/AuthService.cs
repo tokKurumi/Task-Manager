@@ -42,7 +42,7 @@ public class AuthService(
         return new LoginUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn);
     }
 
-    public async Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserCommand request, CancellationToken cancellationToken = default)
     {
         var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
         if (userFindResult is not null)
