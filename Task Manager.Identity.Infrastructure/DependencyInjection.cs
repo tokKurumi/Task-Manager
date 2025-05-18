@@ -31,7 +31,7 @@ public static class DependencyInjection
 
     private static IHostApplicationBuilder AddIdentityDbContext(this IHostApplicationBuilder builder)
     {
-        builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>(Integrations.Identity.PostgreSQLDatabase);
+        builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>(Integrations.IdentityProject.PostgreSQLDatabase);
 
         builder.Services.AddDataProtection();
 

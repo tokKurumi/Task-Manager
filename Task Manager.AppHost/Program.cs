@@ -4,25 +4,25 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 #region identity
 var identityDatabase = builder
-    .AddPostgres(Identity.PostgreSQLResource)
-    .WithDataVolume(Identity.PostgreSQLVolume)
+    .AddPostgres(IdentityProject.PostgreSQLResource)
+    .WithDataVolume(IdentityProject.PostgreSQLVolume)
     .WithPgAdmin()
-    .AddDatabase(Identity.PostgreSQLDatabase);
+    .AddDatabase(IdentityProject.PostgreSQLDatabase);
 
 var identityMigrator = builder
-    .AddProject<Projects.Task_Manager_Identity_Migrator>("task-manager-identity-migrator")
+    .AddProject<Projects.Task_Manager_Identity_Migrator>(IdentityProject.Migrator)
     .WithReference(identityDatabase)
     .WaitFor(identityDatabase);
 
 var identity = builder
-    .AddProject<Projects.Task_Manager_Identity_IdentityAPI>("task-manager-identity-identityapi")
+    .AddProject<Projects.Task_Manager_Identity_IdentityAPI>(IdentityProject.API)
     .WithReference(identityDatabase)
     .WaitFor(identityDatabase)
     .WaitForCompletion(identityMigrator);
 #endregion
 
-builder.AddProject<Projects.Task_Manager_Task_Client>("task-manager-task-client");
+builder.AddProject<Projects.Task_Manager_Task_Client>(TaskProject.Client);
 
-builder.AddProject<Projects.Task_Manager_Task_TaskAPI>("task-manager-task-taskapi");
+builder.AddProject<Projects.Task_Manager_Task_TaskAPI>(TaskProject.API);
 
 await builder.Build().RunAsync();
