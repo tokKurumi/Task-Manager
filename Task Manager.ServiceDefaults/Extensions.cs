@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Task_Manager.Integrations;
 
 namespace Task_Manager.ServiceDefaults;
 
@@ -37,6 +38,8 @@ public static class Extensions
         // {
         //     options.AllowedSchemes = ["https"];
         // });
+
+        builder.ConfigureJwt();
 
         return builder;
     }
@@ -115,5 +118,12 @@ public static class Extensions
         }
 
         return app;
+    }
+
+    public static TBuilder ConfigureJwt<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    {
+        builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+
+        return builder;
     }
 }
