@@ -1,6 +1,6 @@
 ﻿using Mediator;
 using Task_Manager.Common;
-using Task_Manager.Identity.Core.Abstractions;
+using Task_Manager.Identity.Application.Services.Abstractions;
 
 namespace Task_Manager.Identity.Application.UseCases.Auth.Login;
 

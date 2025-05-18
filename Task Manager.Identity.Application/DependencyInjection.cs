@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Task_Manager.Identity.Application.Services;
+using Task_Manager.Identity.Application.Services.Abstractions;
 
 namespace Task_Manager.Identity.Application;
 
@@ -21,7 +23,10 @@ public static class DependencyInjection
 
     private static IHostApplicationBuilder AddMediatr(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddMediator();
+        builder.Services.AddMediator(config =>
+        {
+            config.ServiceLifetime = ServiceLifetime.Scoped;
+        });
 
         return builder;
     }
