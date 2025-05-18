@@ -30,8 +30,6 @@ public static class IdentityServiceExtensions
 
         builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
-        builder.Services.AddInfrastructureMappers();
-
         return builder;
     }
 }

@@ -13,6 +13,15 @@ public class UserEntity : IdentityUser<Guid>, IUserData
 
     public UserEntity() { }
 
+    public UserEntity(ApplicationUser domainUser)
+    {
+        Id = domainUser.Id;
+        Email = domainUser.Email;
+        DisplayName = domainUser.DisplayName;
+        PasswordHash = domainUser.PasswordHash;
+        CreatedAt = domainUser.CreatedAt;
+    }
+
     public UserEntity(Guid id, string email, string displayName, string passwordHash, DateTimeOffset createdAt)
     {
         Id = id;

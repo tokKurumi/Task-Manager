@@ -4,21 +4,21 @@ using Task_Manager.Common;
 using Task_Manager.Identity.Core.Abstractions;
 using Task_Manager.Identity.Core.Entities;
 using Task_Manager.Identity.Infrastructure.Entities;
-using Task_Manager.Identity.Infrastructure.Mappers;
 using IdentityFrameworkError = Microsoft.AspNetCore.Identity.IdentityError;
 
 namespace Task_Manager.Identity.Infrastructure.Repositories;
 
 public class ApplicationUserRepository(
     UserManager<UserEntity> userManager,
-    ApplicationUserMapper userMapper
+    TimeProvider timeProvider
 ) : IApplicationUserRepository
 {
     private readonly UserManager<UserEntity> _userManager = userManager;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
     public async Task<Result<ApplicationUser, ApplicationUserRepositoryError>> CreateUserAsync(ApplicationUser user, string password, CancellationToken cancellationToken = default)
     {
-        var identityUser = ApplicationUserMapper.MapToInfrastructureModel(user);
+        var identityUser = new UserEntity(user);
         var userCreateResult = await _userManager.CreateAsync(identityUser, password);
         if (!userCreateResult.Succeeded)
         {
@@ -36,7 +36,7 @@ public class ApplicationUserRepository(
             return Result<ApplicationUser?, ApplicationUserRepositoryError>.Success(null);
         }
 
-        var domainModelMapResult = userMapper.TryMapToDomainModel(identityUser);
+        var domainModelMapResult = ApplicationUser.TryCreate(identityUser, _timeProvider);
         if (domainModelMapResult.IsFailure)
         {
             return new InnerDomainError(domainModelMapResult.Error!);
@@ -53,7 +53,7 @@ public class ApplicationUserRepository(
             return Result<ApplicationUser?, ApplicationUserRepositoryError>.Success(null);
         }
 
-        var domainModelMapResult = userMapper.TryMapToDomainModel(identityUser);
+        var domainModelMapResult = ApplicationUser.TryCreate(identityUser, _timeProvider);
         if (domainModelMapResult.IsFailure)
         {
             return new InnerDomainError(domainModelMapResult.Error!);
@@ -71,7 +71,7 @@ public class ApplicationUserRepository(
 
         var totalCount = await _userManager.Users.CountAsync(cancellationToken);
 
-        var domainModelMapResults = identityUsers.ConvertAll(userMapper.TryMapToDomainModel).ToList();
+        var domainModelMapResults = identityUsers.ConvertAll(identityUser => ApplicationUser.TryCreate(identityUser, _timeProvider)).ToList();
         if (domainModelMapResults.Any(result => result.IsFailure))
         {
             return new InnerDomainErrors([.. domainModelMapResults.Select(result => result.Error!)]);
