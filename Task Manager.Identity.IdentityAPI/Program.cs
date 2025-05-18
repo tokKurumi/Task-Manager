@@ -1,5 +1,5 @@
 using Scalar.AspNetCore;
-using Task_Manager.Identity.Infrastructure.Extensions;
+using Task_Manager.Identity.Infrastructure;
 using Task_Manager.ServiceDefaults;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +9,7 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-builder.AddIdentityDbContext();
+builder.AddInfrastructure();
 
 var app = builder.Build();
 

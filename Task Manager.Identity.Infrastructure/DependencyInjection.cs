@@ -6,11 +6,25 @@ using Task_Manager.Identity.Infrastructure.Data;
 using Task_Manager.Identity.Infrastructure.Entities;
 using Task_Manager.Identity.Infrastructure.Repositories;
 
-namespace Task_Manager.Identity.Infrastructure.Extensions;
+namespace Task_Manager.Identity.Infrastructure;
 
-public static class IdentityServiceExtensions
+public static class DependencyInjection
 {
-    public static IHostApplicationBuilder AddIdentityDbContext(this IHostApplicationBuilder builder)
+    public static IHostApplicationBuilder AddInfrastructure(this IHostApplicationBuilder builder)
+    {
+        return builder
+            .AddRepositories()
+            .AddIdentityDbContext();
+    }
+
+    private static IHostApplicationBuilder AddRepositories(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+
+        return builder;
+    }
+
+    private static IHostApplicationBuilder AddIdentityDbContext(this IHostApplicationBuilder builder)
     {
         builder.AddNpgsqlDbContext<ApplicationIdentityDbContext>(Integrations.Identity.PostgreSQLDatabase);
 
@@ -27,8 +41,6 @@ public static class IdentityServiceExtensions
         .AddTokenProvider<DataProtectorTokenProvider<UserEntity>>("Default");
 
         builder.Services.AddScoped<RoleManager<IdentityRole<Guid>>>();
-
-        builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
         return builder;
     }
