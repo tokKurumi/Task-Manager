@@ -1,4 +1,5 @@
 using Scalar.AspNetCore;
+using Task_Manager.Identity.Application;
 using Task_Manager.Identity.Infrastructure;
 using Task_Manager.ServiceDefaults;
 
@@ -9,6 +10,7 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+builder.AddApplication();
 builder.AddInfrastructure();
 
 var app = builder.Build();
@@ -27,4 +29,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
