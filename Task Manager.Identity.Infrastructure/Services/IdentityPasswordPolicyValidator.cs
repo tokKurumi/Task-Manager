@@ -22,8 +22,8 @@ public class IdentityPasswordPolicyValidator(
         if (!result.Succeeded)
         {
             var errors = result.Errors
-                .Select(error => (error.Code, error.Description))
-                .ToArray();
+                .ToList()
+                .ConvertAll(error => new PasswordPolicyErrorItem(error.Code, error.Description));
 
             return new PasswordPolicyError(errors);
         }
