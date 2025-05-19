@@ -3,10 +3,9 @@ using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Task_Manager.Identity.Application.Services;
 using Task_Manager.Identity.Application.Services.Abstractions;
-using Task_Manager.Identity.Application.UseCases.Auth.Login;
-using Task_Manager.Identity.Application.UseCases.Auth.Register;
+using Task_Manager.Identity.IdentityAPI.Controllers.Auth.Models;
 
-namespace Task_Manager.Identity.IdentityAPI.Controllers;
+namespace Task_Manager.Identity.IdentityAPI.Controllers.Auth;
 
 [ApiController]
 [ApiVersion(1.0)]
@@ -18,9 +17,9 @@ public class AuthController(
     private readonly ISender _sender = sender;
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> Register([FromBody] RegisterUserRequest command, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(command, cancellationToken);
+        var result = await _sender.Send(AuthMapper.ToUseCase(command), cancellationToken);
 
         return result.Match(
             Ok,
@@ -31,7 +30,8 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(request, cancellationToken);
+        var result = await _sender.Send(AuthMapper.ToUseCase(request), cancellationToken);
+
         return result.Match(
             Ok,
             MapAuthError
