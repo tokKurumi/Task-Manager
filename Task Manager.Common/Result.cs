@@ -4,9 +4,18 @@ namespace Task_Manager.Common;
 
 public interface IError;
 
-public sealed record OneOfError<TError1, TError2>(OneOf<TError1, TError2> Value) : IError
+public sealed record OneOfError<TError1, TError2>(
+    OneOf<TError1, TError2> Value
+) : IError
     where TError1 : IError
-    where TError2 : IError;
+    where TError2 : IError
+{
+    public static implicit operator OneOfError<TError1, TError2>(TError1 error)
+        => new(OneOf<TError1, TError2>.FromT0(error));
+
+    public static implicit operator OneOfError<TError1, TError2>(TError2 error)
+        => new(OneOf<TError1, TError2>.FromT1(error));
+}
 
 public abstract class ResultBase<TError>
     where TError : IError
@@ -14,7 +23,6 @@ public abstract class ResultBase<TError>
     protected TError? _error;
 
     public bool IsSuccess { get; init; }
-
     public bool IsFailure => !IsSuccess;
 
     public TError? Error
@@ -48,19 +56,36 @@ public sealed class Result<TError> : ResultBase<TError>
     public static implicit operator Result<TError>(TError error) => Failure(error);
 }
 
-public sealed class Result<T, TError> : ResultBase<TError>
+public abstract class ResultBase<T, TError>
     where TError : IError
 {
-    private T? _value;
+    protected T? _value;
+    protected TError? _error;
+
+    public bool IsSuccess { get; init; }
+    public bool IsFailure => !IsSuccess;
 
     public T? Value
     {
         get => IsSuccess ? _value : throw new InvalidOperationException("Result is not successful.");
-        private set => _value = value;
+        protected set => _value = value;
+    }
+    public TError? Error
+    {
+        get => IsFailure ? _error : throw new InvalidOperationException("Result is successful.");
+        protected set => _error = value;
     }
 
+    protected ResultBase(bool isSuccess, T? value, TError? error)
+        => (IsSuccess, Value, Error) = (isSuccess, value, error);
+}
+
+public sealed class Result<T, TError> : ResultBase<T, TError>
+    where TError : IError
+{
     private Result(bool isSuccess, T? value, TError? error)
-        : base(isSuccess, error) => Value = value;
+        : base(isSuccess, value, error)
+    { }
 
     public static Result<T, TError> Success(T value)
         => new(true, value, default);
