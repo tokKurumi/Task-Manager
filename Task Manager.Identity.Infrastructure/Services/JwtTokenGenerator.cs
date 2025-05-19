@@ -10,13 +10,17 @@ using Task_Manager.Integrations;
 namespace Task_Manager.Identity.Infrastructure.Services;
 
 public class JwtTokenGenerator(
-    IOptions<JwtOptions> options
+    IOptions<JwtOptions> options,
+    TimeProvider timeProvider
 ) : IJwtTokenGenerator
 {
     private readonly JwtOptions _options = options.Value;
+    private readonly TimeProvider _timeProvider = timeProvider;
 
-    public JwtToken GenerateToken(ApplicationUser user, DateTimeOffset issuedAt, TimeSpan expiresIn)
+    public JwtToken GenerateToken(ApplicationUser user)
     {
+        var issuedAt = _timeProvider.GetUtcNow();
+
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
@@ -32,7 +36,7 @@ public class JwtTokenGenerator(
             audience: _options.Audience,
             claims: claims,
             notBefore: issuedAt.UtcDateTime,
-            expires: issuedAt.Add(expiresIn).UtcDateTime,
+            expires: issuedAt.Add(_options.AccessTokenLifetime).UtcDateTime,
             signingCredentials: creds
         );
 
@@ -42,7 +46,7 @@ public class JwtTokenGenerator(
             accessToken,
             "", // TODO: Implement refresh token generation
             issuedAt,
-            expiresIn
+            _options.AccessTokenLifetime
         );
     }
 }

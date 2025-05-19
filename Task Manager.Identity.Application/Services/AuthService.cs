@@ -14,8 +14,6 @@ public class AuthService(
     TimeProvider timeProvider
 ) : IAuthService
 {
-    private readonly TimeSpan _expiresIn = TimeSpan.FromMinutes(30); // TODO: make it configurable
-
     private readonly IApplicationUserRepository _userRepository = userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator = jwtTokenGenerator;
     private readonly IPasswordPolicyValidator _passwordPolicyValidator = passwordPolicyValidator;
@@ -42,11 +40,9 @@ public class AuthService(
             return new InvalidPasswordError(request.Email);
         }
 
-        var issuedAt = _timeProvider.GetUtcNow();
-        var expiresIn = _expiresIn;
-        var jwtToken = _jwtTokenGenerator.GenerateToken(user, issuedAt, expiresIn);
+        var jwtToken = _jwtTokenGenerator.GenerateToken(user);
 
-        return new LoginUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn);
+        return new LoginUserResponse(user.Id, jwtToken.AccessToken, jwtToken.RefreshToken, jwtToken.IssuedAt, jwtToken.ExpiresIn);
     }
 
     public async Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserCommand request, CancellationToken cancellationToken = default)
@@ -83,11 +79,9 @@ public class AuthService(
             return new RepositoryCreateUserError(userCreateRepositoryResult.Error!);
         }
 
-        var issuedAt = _timeProvider.GetUtcNow();
-        var expiresIn = _expiresIn;
-        var jwtToken = _jwtTokenGenerator.GenerateToken(createdUser, issuedAt, expiresIn);
+        var jwtToken = _jwtTokenGenerator.GenerateToken(createdUser);
 
-        return new RegisterUserResponse(createdUser.Id, jwtToken.AccessToken, jwtToken.RefreshToken, issuedAt, expiresIn);
+        return new RegisterUserResponse(createdUser.Id, jwtToken.AccessToken, jwtToken.RefreshToken, jwtToken.IssuedAt, jwtToken.ExpiresIn);
     }
 }
 
