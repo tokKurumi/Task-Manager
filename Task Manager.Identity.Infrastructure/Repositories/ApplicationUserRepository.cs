@@ -32,6 +32,13 @@ public class ApplicationUserRepository(
         return user;
     }
 
+    public async Task<bool> IsUniqueEmail(string email, CancellationToken cancellationToken = default)
+    {
+        return !await _userManager.Users
+            .AsNoTracking()
+            .AllAsync(user => user.Email == email, cancellationToken);
+    }
+
     public async Task<Result<ApplicationUser?, ApplicationUserRepositoryError>> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         var identityUser = await _userManager.FindByEmailAsync(email);
@@ -87,8 +94,8 @@ public class ApplicationUserRepository(
     }
 }
 
-public sealed record IdentityError(IReadOnlyCollection<IdentityFrameworkError> InnerErrors) : ApplicationUserRepositoryError("IdentityError");
+public sealed record IdentityError(IReadOnlyCollection<IdentityFrameworkError> InnerErrors) : ApplicationUserRepositoryError;
 
-public sealed record InnerDomainError(ApplicationUserError InnerError) : ApplicationUserRepositoryError($"Domain.{InnerError.Code}");
+public sealed record InnerDomainError(ApplicationUserError InnerError) : ApplicationUserRepositoryError;
 
-public sealed record InnerDomainErrors(IReadOnlyCollection<ApplicationUserError> InnerErrors) : ApplicationUserRepositoryError($"Domain.MultipleErrors");
+public sealed record InnerDomainErrors(IReadOnlyCollection<ApplicationUserError> InnerErrors) : ApplicationUserRepositoryError;
