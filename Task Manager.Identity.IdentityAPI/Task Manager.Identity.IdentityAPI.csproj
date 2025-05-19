@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.5">
         <PrivateAssets>all</PrivateAssets>
@@ -19,10 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Task Manager.ServiceDefaults\Task Manager.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Task Manager.Identity.Infrastructure\Task Manager.Identity.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
