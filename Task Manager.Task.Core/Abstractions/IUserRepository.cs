@@ -11,4 +11,4 @@ public interface IUserRepository
     Task<Page<User>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 
-public abstract record UserRepositoryError(string Code) : Error(Code);
+public abstract record UserRepositoryError : IError;

@@ -28,6 +28,6 @@ public class TaskComment
     }
 }
 
-public abstract record TaskCommentError(string Code) : Error(Code);
+public abstract record TaskCommentError : IError;
 
-public sealed record EmptyMessageError() : TaskCommentError("EmptyMessage");
+public sealed record EmptyMessageError : TaskCommentError;

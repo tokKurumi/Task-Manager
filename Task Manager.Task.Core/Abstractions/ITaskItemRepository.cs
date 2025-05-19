@@ -13,4 +13,4 @@ public interface ITaskItemRepository
     Task<Page<TaskItem>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 
-public abstract record TaskItemRepositoryError(string Code) : Error(Code);
+public abstract record TaskItemRepositoryError : IError;

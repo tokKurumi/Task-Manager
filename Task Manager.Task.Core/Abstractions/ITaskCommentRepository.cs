@@ -10,4 +10,4 @@ public interface ITaskCommentRepository
     Task<Page<TaskComment>> GetPageByTaskIdAsync(Guid taskId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 
-public abstract record TaskCommentRepositoryError(string Code) : Error(Code);
+public abstract record TaskCommentRepositoryError : IError;

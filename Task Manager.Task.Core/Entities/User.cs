@@ -50,10 +50,10 @@ public class User
     }
 }
 
-public abstract record UserError(string Code) : Error(Code);
+public abstract record UserError : IError;
 
-public sealed record EmptyEmailError() : UserError("EmptyEmail");
+public sealed record EmptyEmailError : UserError;
 
-public sealed record EmptyFullNameError() : UserError("EmptyFullName");
+public sealed record EmptyFullNameError : UserError;
 
-public sealed record UserTaskError(TaskItemError InnerError) : UserError($"Task.{InnerError.Code}");
+public sealed record UserTaskError(TaskItemError InnerError) : UserError;

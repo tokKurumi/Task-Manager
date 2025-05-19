@@ -64,10 +64,10 @@ public class ApplicationUser
     }
 }
 
-public abstract record ApplicationUserError(string Code) : Error(Code);
+public abstract record ApplicationUserError : IError;
 
-public sealed record EmptyEmailError() : ApplicationUserError("EmptyEmail");
+public sealed record EmptyEmailError : ApplicationUserError;
 
-public sealed record EmptyDisplayNameError() : ApplicationUserError("EmptyDisplayName");
+public sealed record EmptyDisplayNameError : ApplicationUserError;
 
-public sealed record EmptyPasswordHashError() : ApplicationUserError("EmptyPasswordHash");
+public sealed record EmptyPasswordHashError : ApplicationUserError;

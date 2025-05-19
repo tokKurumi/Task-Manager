@@ -61,10 +61,10 @@ public class TaskItem
     }
 }
 
-public abstract record TaskItemError(string Code) : Error(Code);
+public abstract record TaskItemError : IError;
 
-public sealed record EmptyTitleError() : TaskItemError("EmptyTitle");
+public sealed record EmptyTitleError : TaskItemError;
 
-public sealed record EmptyDescriptionError() : TaskItemError("EmptyDescription");
+public sealed record EmptyDescriptionError : TaskItemError;
 
-public sealed record CommentError(TaskCommentError InnerError) : TaskItemError($"Comment.{InnerError.Code}");
+public sealed record CommentError(TaskCommentError InnerError) : TaskItemError;

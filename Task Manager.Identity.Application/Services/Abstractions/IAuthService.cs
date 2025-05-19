@@ -9,4 +9,4 @@ public interface IAuthService
     Task<Result<LoginUserResponse, AuthError>> LoginAsync(LoginUserRequest request, CancellationToken cancellationToken = default);
 }
 
-public abstract record AuthError(string Code) : Error(Code);
+public abstract record AuthError : IError;

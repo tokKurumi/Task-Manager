@@ -1,9 +1,15 @@
-﻿namespace Task_Manager.Common;
+﻿using OneOf;
 
-public abstract record Error(string Code);
+namespace Task_Manager.Common;
+
+public interface IError;
+
+public sealed record OneOfError<TError1, TError2>(OneOf<TError1, TError2> Value) : IError
+    where TError1 : IError
+    where TError2 : IError;
 
 public abstract class ResultBase<TError>
-    where TError : Error
+    where TError : IError
 {
     protected TError? _error;
 
@@ -22,7 +28,7 @@ public abstract class ResultBase<TError>
 }
 
 public sealed class Result<TError> : ResultBase<TError>
-    where TError : Error
+    where TError : IError
 {
     private Result(bool isSuccess, TError? error)
         : base(isSuccess, error) { }
@@ -33,11 +39,17 @@ public sealed class Result<TError> : ResultBase<TError>
     public static Result<TError> Failure(TError error)
         => new(false, error);
 
+    public Result<TNewError> MapError<TNewError>(Func<TError, TNewError> map)
+        where TNewError : IError
+        => IsSuccess
+            ? Result<TNewError>.Success()
+            : Result<TNewError>.Failure(map(Error!));
+
     public static implicit operator Result<TError>(TError error) => Failure(error);
 }
 
 public sealed class Result<T, TError> : ResultBase<TError>
-    where TError : Error
+    where TError : IError
 {
     private T? _value;
 
@@ -64,6 +76,12 @@ public sealed class Result<T, TError> : ResultBase<TError>
 
     public Result<TResult, TError> Map<TResult>(Func<T, TResult> mapper) =>
         IsSuccess ? Result<TResult, TError>.Success(mapper(Value!)) : Result<TResult, TError>.Failure(Error!);
+
+    public Result<T, TNewError> MapError<TNewError>(Func<TError, TNewError> map)
+        where TNewError : IError
+        => IsSuccess
+            ? Result<T, TNewError>.Success(Value!)
+            : Result<T, TNewError>.Failure(map(Error!));
 
     public Result<TResult, TError> Bind<TResult>(Func<T, Result<TResult, TError>> binder) =>
         IsSuccess ? binder(Value!) : Result<TResult, TError>.Failure(Error!);
