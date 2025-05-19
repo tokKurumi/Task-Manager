@@ -6,6 +6,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var identityDatabase = builder
     .AddPostgres(IdentityProject.PostgreSQLResource)
     .WithDataVolume(IdentityProject.PostgreSQLVolume)
+    .WithLifetime(ContainerLifetime.Persistent)
     .WithPgAdmin()
     .AddDatabase(IdentityProject.PostgreSQLDatabase);
 
