@@ -6,3 +6,8 @@ public sealed record ValidationFailureInfo(
 );
 
 public sealed record ValidationError(IReadOnlyCollection<ValidationFailureInfo> InnerFailures) : IError;
+
+public interface IValidationErrorFactory<out TResponse>
+{
+    TResponse Create(ValidationError error);
+}

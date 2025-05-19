@@ -1,10 +1,13 @@
 ﻿using FluentValidation;
-﻿using Mediator;
+using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
+using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services;
 using Task_Manager.Identity.Application.Services.Abstractions;
+using Task_Manager.Identity.Application.UseCases.Auth.Login;
+using Task_Manager.Identity.Application.UseCases.Auth.Register;
 
 namespace Task_Manager.Identity.Application;
 
@@ -20,7 +23,7 @@ public static class DependencyInjection
 
     private static IHostApplicationBuilder AddValiadtion(this IHostApplicationBuilder builder)
     {
-        builder.Services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        builder.Services.AddValidatorsFromAssembly(typeof(Assembly).Assembly);
 
         return builder;
     }
@@ -40,6 +43,16 @@ public static class DependencyInjection
         });
 
         builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TracingBehavior<,>));
+        builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+        builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandValidationBehavior<,>));
+
+        builder.Services.Scan(scan =>
+        {
+            scan.FromAssemblyOf<Assembly>()
+                .AddClasses(classes => classes.AssignableTo(typeof(IValidationErrorFactory<>)))
+                .AsImplementedInterfaces()
+                .WithScopedLifetime();
+        });
 
         return builder;
     }
@@ -58,4 +71,20 @@ public class TracingBehavior<TMessage, TResponse>(
 
         return next(message, cancellationToken);
     }
+}
+
+// TODO: think a way to generate IValidationErrorFactory for it's Scrutor registration
+// Mb use Roslyn to generate it?
+public class LoginUserValidationErrorFactory
+    : IValidationErrorFactory<Result<LoginUserResponse, OneOfError<AuthError, ValidationError>>>
+{
+    public Result<LoginUserResponse, OneOfError<AuthError, ValidationError>> Create(ValidationError error)
+        => new OneOfError<AuthError, ValidationError>(error);
+}
+
+public class RegisterUserValidationErrorFactory
+    : IValidationErrorFactory<Result<RegisterUserResponse, OneOfError<AuthError, ValidationError>>>
+{
+    public Result<RegisterUserResponse, OneOfError<AuthError, ValidationError>> Create(ValidationError error)
+        => new OneOfError<AuthError, ValidationError>(error);
 }
