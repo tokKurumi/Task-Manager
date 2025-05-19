@@ -85,14 +85,14 @@ public class AuthService(
     }
 }
 
-public sealed record UserAlreadyExistError(string Email) : AuthError("UserAlreadyExists");
+public sealed record UserAlreadyExistError(string Email) : AuthError;
 
-public sealed record CreationUserError(ApplicationUserError InnerError) : AuthError($"CreationUser.{InnerError.Code}");
+public sealed record CreationUserError(ApplicationUserError InnerError) : AuthError;
 
-public sealed record RepositoryCreateUserError(ApplicationUserRepositoryError InnerError) : AuthError($"RepositoryCreateUser.{InnerError.Code}");
+public sealed record RepositoryCreateUserError(ApplicationUserRepositoryError InnerError) : AuthError;
 
-public sealed record PasswordPolicyValidationResult(PasswordPolicyError InnerError) : AuthError($"PasswordPolicyValidation.{InnerError.Code}");
+public sealed record PasswordPolicyValidationResult(PasswordPolicyError InnerError) : AuthError;
 
-public sealed record UserNotFoundError(string Email) : AuthError("UserNotFound");
+public sealed record UserNotFoundError(string Email) : AuthError;
 
-public sealed record InvalidPasswordError(string Email) : AuthError("InvalidPassword");
+public sealed record InvalidPasswordError(string Email) : AuthError;
