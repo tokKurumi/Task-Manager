@@ -22,8 +22,11 @@ public class AuthController(
         var result = await _sender.Send(AuthMapper.ToUseCase(command), cancellationToken);
 
         return result.Match(
-            Ok,
-            MapAuthError
+            onSuccess: Ok,
+            onFailure: error => error.Value.Match(
+                authError => MapAuthError(authError),
+                validationError => new BadRequestObjectResult(validationError.InnerFailures)
+            )
         );
     }
 
@@ -33,8 +36,11 @@ public class AuthController(
         var result = await _sender.Send(AuthMapper.ToUseCase(request), cancellationToken);
 
         return result.Match(
-            Ok,
-            MapAuthError
+            onSuccess: Ok,
+            onFailure: error => error.Value.Match(
+                authError => MapAuthError(authError),
+                validationError => new BadRequestObjectResult(validationError.InnerFailures)
+            )
         );
     }
 

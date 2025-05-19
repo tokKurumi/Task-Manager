@@ -1,4 +1,5 @@
-﻿using Mediator;
+﻿using FluentValidation;
+using Mediator;
 using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services.Abstractions;
 
@@ -8,7 +9,7 @@ public sealed record RegisterUserCommand(
     string Email,
     string DisplayName,
     string Password
-) : ICommand<Result<RegisterUserResponse, AuthError>>;
+) : ICommand<Result<RegisterUserResponse, OneOfError<AuthError, ValidationError>>>;
 
 public sealed record RegisterUserResponse(
     Guid UserId,
@@ -17,3 +18,24 @@ public sealed record RegisterUserResponse(
     DateTimeOffset IssuedAt,
     TimeSpan ExpiresIn
 );
+
+public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+{
+    public RegisterUserCommandValidator(
+        IApplicationUserRepository userRepository
+    )
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email should not be empty.")
+            .EmailAddress().WithMessage("Invalid email format.")
+            .MustAsync(userRepository.IsUniqueEmail).WithMessage("This email is taken.");
+
+        RuleFor(x => x.DisplayName)
+            .NotEmpty().WithMessage("Display name should not be empty.");
+
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage("Password should not be empty")
+            .MinimumLength(6).WithMessage("Password must be at least 6 characters long.")
+            .Matches(@"\d").WithMessage("Password must contain at least one digit.");
+    }
+}

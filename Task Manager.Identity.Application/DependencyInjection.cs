@@ -1,3 +1,4 @@
+﻿using FluentValidation;
 ﻿using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,7 +14,15 @@ public static class DependencyInjection
     {
         return builder
             .AddServices()
+            .AddValiadtion()
             .AddMediatr();
+    }
+
+    private static IHostApplicationBuilder AddValiadtion(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+
+        return builder;
     }
 
     private static IHostApplicationBuilder AddServices(this IHostApplicationBuilder builder)
