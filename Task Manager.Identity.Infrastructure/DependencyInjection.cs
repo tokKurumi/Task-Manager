@@ -40,6 +40,7 @@ public static class DependencyInjection
             options.Password.RequireDigit = true;
             options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
+            options.Password.RequireUppercase = false;
         })
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
