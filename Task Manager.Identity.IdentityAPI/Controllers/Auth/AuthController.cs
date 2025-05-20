@@ -48,11 +48,11 @@ public class AuthController(
     {
         return error switch
         {
-            UserAlreadyExistError alreadyExistError => new ConflictObjectResult($"User with {alreadyExistError.Email} does already exist."),
+            UserAlreadyExistError alreadyExistError => new ConflictObjectResult($"User with {alreadyExistError.Email} email does already exist."),
             CreationUserError creationError => new BadRequestObjectResult(creationError.InnerError),
             RepositoryCreateUserError repositoryCreateError => new BadRequestObjectResult(repositoryCreateError.InnerError),
             PasswordPolicyValidationResult passwordPolicyError => new BadRequestObjectResult(passwordPolicyError.InnerError),
-            UserNotFoundError notFoundError => new NotFoundObjectResult($"User with {notFoundError.Email} does not exist."),
+            UserNotFoundError notFoundError => new NotFoundObjectResult($"User with {notFoundError.Email} email does not exist."),
             InvalidPasswordError invalidPasswordError => new UnauthorizedObjectResult($"Invalid password for user {invalidPasswordError.Email}."),
             _ => throw new Exception("") // TODO: think about handling unexpected errors
         };

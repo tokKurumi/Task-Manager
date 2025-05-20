@@ -1,5 +1,7 @@
 using Asp.Versioning;
+using FluentValidation;
 using Scalar.AspNetCore;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using Task_Manager.Identity.Application;
 using Task_Manager.Identity.IdentityAPI.Extensions;
 using Task_Manager.Identity.Infrastructure;
@@ -31,6 +33,9 @@ builder.Services.Configure<RouteOptions>(options =>
 {
     options.LowercaseUrls = true;
 });
+
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.AddApplication();
 builder.AddInfrastructure();
