@@ -41,6 +41,7 @@ public static class DependencyInjection
             options.Password.RequiredLength = 8;
             options.User.RequireUniqueEmail = true;
             options.Password.RequireUppercase = false;
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ ";
         })
         .AddRoles<IdentityRole<Guid>>()
         .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
