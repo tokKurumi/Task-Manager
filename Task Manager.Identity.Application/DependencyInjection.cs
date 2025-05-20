@@ -104,10 +104,6 @@ public static class DependencyInjection
             var factoryType = typeof(GenericValidationErrorFactory<,>).MakeGenericType(tType, tErrorType);
             var responseType = typeof(Result<,>).MakeGenericType(tType, typeof(OneOfError<,>).MakeGenericType(tErrorType, typeof(ValidationError)));
             var interfaceType = typeof(IValidationErrorFactory<>).MakeGenericType(responseType);
-            if (interfaceType is null || factoryType is null)
-            {
-                continue;
-            }
 
             factoriesToRegister.Add((interfaceType, factoryType));
         }
