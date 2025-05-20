@@ -3,6 +3,7 @@ using FluentValidation;
 using Scalar.AspNetCore;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using Task_Manager.Identity.Application;
+using Task_Manager.Identity.IdentityAPI.ExceptionHandlers;
 using Task_Manager.Identity.IdentityAPI.Extensions;
 using Task_Manager.Identity.Infrastructure;
 using Task_Manager.ServiceDefaults;
@@ -10,6 +11,11 @@ using Task_Manager.ServiceDefaults;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+}
 
 builder.Services.AddControllers(options =>
 {
@@ -42,6 +48,11 @@ builder.AddInfrastructure();
 
 var app = builder.Build();
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/error");
+}
+
 app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
@@ -52,6 +63,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
