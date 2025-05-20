@@ -28,7 +28,7 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email should not be empty.")
             .EmailAddress().WithMessage("Invalid email format.")
-            .MustAsync(userRepository.IsUniqueEmail).WithMessage("This email is taken.");
+            .MustAsync(async (email, cancelation) => !await userRepository.IsUniqueEmail(email, cancelation)).WithMessage("This email is taken.");
 
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage("Display name should not be empty.");
