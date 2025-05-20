@@ -36,7 +36,7 @@ public class ApplicationUserRepository(
     {
         return !await _userManager.Users
             .AsNoTracking()
-            .AllAsync(user => user.Email == email, cancellationToken);
+            .AnyAsync(u => u.Email == email, cancellationToken);
     }
 
     public async Task<Result<ApplicationUser?, ApplicationUserRepositoryError>> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
