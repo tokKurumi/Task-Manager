@@ -122,7 +122,18 @@ public static class Extensions
 
     public static TBuilder ConfigureJwt<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
-        builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
+        // Maybe use Keycloak, https://learn.microsoft.com/en-us/dotnet/aspire/authentication/keycloak-integration?tabs=dotnet-cli
+        // TODO: think about key rotation and secret management, read about:
+        // 1. OIDC
+        // 2. JWK
+
+        builder.Services.AddOptions<JwtOptions>()
+            .BindConfiguration(nameof(JwtIntegration))
+            .Validate(options => options.SecretKey is not null, "The secret key should not be empty")
+            .Validate(options => options.Audience is not null, "The audience should not be empty")
+            .Validate(options => options.Issuer is not null, "The issuer should not be empty")
+            .Validate(options => options.AccessTokenLifetime > TimeSpan.Zero, "The access token lifetime should be greater than zero")
+            .ValidateOnStart();
 
         return builder;
     }
