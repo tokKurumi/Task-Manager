@@ -6,8 +6,20 @@ namespace Task_Manager.Identity.Infrastructure.Entities;
 public class UserEntity : IdentityUser<Guid>, IUserData
 {
     public override Guid Id => base.Id;
-    public override string Email => base.Email ?? string.Empty;
-    public string DisplayName { get => base.UserName ?? string.Empty; set => base.UserName = value; }
+
+    string IUserData.Email => Email ?? string.Empty;
+    public override string? Email
+    {
+        get => base.Email;
+        set
+        {
+            base.Email = value;
+            base.UserName = value;
+        }
+    }
+
+    public string DisplayName { get; set; } = string.Empty;
+
     public DateTimeOffset CreatedAt { get; set; }
 
     public UserEntity() { }
