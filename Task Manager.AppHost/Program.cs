@@ -22,8 +22,6 @@ var identity = builder
     .WaitForCompletion(identityMigrator);
 #endregion
 
-builder.AddProject<Projects.Task_Manager_Task_Client>(TaskProject.Client);
-
 builder.AddProject<Projects.Task_Manager_Task_TaskAPI>(TaskProject.API);
 
 await builder.Build().RunAsync();

@@ -10,7 +10,6 @@
   </Folder>
   <Folder Name="/Services/Task/">
     <Project Path="Task Manager.Task.Application/Task Manager.Task.Application.csproj" />
-    <Project Path="Task Manager.Task.Client/Task Manager.Task.Client.csproj" />
     <Project Path="Task Manager.Task.Core/Task Manager.Task.Core.csproj" />
     <Project Path="Task Manager.Task.Infrastructure/Task Manager.Task.Infrastructure.csproj" />
     <Project Path="Task Manager.Task.TaskAPI/Task Manager.Task.TaskAPI.csproj" />
