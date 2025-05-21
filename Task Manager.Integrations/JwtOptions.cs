@@ -12,6 +12,6 @@ public static class JwtIntegration
 {
     public static string JwtSecretKeyEnvironment => $"{nameof(JwtIntegration)}__{nameof(JwtOptions.SecretKey)}";
     public static string JwtIssuerEnvironment => $"{nameof(JwtIntegration)}__{nameof(JwtOptions.Issuer)}";
-    public static string JwtAudienceEnvironment => $"{nameof(JwtIntegration)} __{nameof(JwtOptions.Audience)}";
-    public static string JwtAccessTokenLifetimeEnvironment => $"{nameof(JwtIntegration)} __{nameof(JwtOptions.AccessTokenLifetime)}";
+    public static string JwtAudienceEnvironment => $"{nameof(JwtIntegration)}__{nameof(JwtOptions.Audience)}";
+    public static string JwtAccessTokenLifetimeEnvironment => $"{nameof(JwtIntegration)}__{nameof(JwtOptions.AccessTokenLifetime)}";
 }
