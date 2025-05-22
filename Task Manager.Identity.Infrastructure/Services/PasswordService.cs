@@ -20,7 +20,11 @@ public class PasswordService(
 
     public async Task<bool> VerifyHashedPassword(ApplicationUser user, string providedPassword)
     {
-        var userEntity = new UserEntity(user);
+        var userEntity = await _userManager.FindByIdAsync(user.Id.ToString());
+        if (userEntity is null)
+        {
+            return false;
+        }
 
         return await _userManager.CheckPasswordAsync(userEntity, providedPassword);
     }
