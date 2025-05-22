@@ -2,7 +2,7 @@
 
 namespace Task_Manager.Task.Core.Entities;
 
-public class TaskComment
+public sealed class TaskComment
 {
     public Guid Id { get; init; }
     public User Author { get; init; }

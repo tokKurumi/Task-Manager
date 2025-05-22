@@ -2,58 +2,36 @@
 
 namespace Task_Manager.Task.Core.Entities;
 
-public class User
+// projection of user from Identity micro-service
+public sealed class User
 {
-    private readonly List<TaskItem> _tasks = [];
+    private readonly Dictionary<Guid, TaskItem> _tasks = [];
 
+    // entire application unique identifier,
+    // which controls under Identity micro-service
     public Guid Id { get; init; }
-    public string Email { get; init; }
-    public string FullName { get; private set; }
-    public DateTimeOffset CreatedAt { get; init; }
-    public IReadOnlyCollection<TaskItem> Tasks => _tasks.AsReadOnly();
+    public string DisplayName { get; private set; }
+    public IReadOnlyCollection<TaskItem> Tasks => _tasks.Values;
 
-    private User(string email, string fullName, DateTimeOffset createdAt)
+    public User(Guid id, string displayName)
     {
-        Id = Guid.CreateVersion7();
-        Email = email;
-        FullName = fullName;
-        CreatedAt = createdAt;
+        Id = id;
+        DisplayName = displayName;
     }
 
-    public static Result<User, UserError> TryCreate(string email, string fullName, TimeProvider timeProvider)
+    public Result<UserAddTaskError> TryAddTask(TaskItem task)
     {
-        if (string.IsNullOrWhiteSpace(email))
+        if (_tasks.ContainsKey(task.Id))
         {
-            return new EmptyEmailError();
+            return new DuplicateTaskError(task);
         }
 
-        if (string.IsNullOrEmpty(fullName))
-        {
-            return new EmptyFullNameError();
-        }
+        _tasks.Add(task.Id, task);
 
-        return new User(email, fullName, timeProvider.GetUtcNow());
-    }
-
-    public Result<TaskItem, UserError> TryCreateTask(string title, string description, TimeProvider timeProvider)
-    {
-        var taskResult = TaskItem.TryCreate(this, title, description, timeProvider);
-        if (taskResult.IsFailure)
-        {
-            return new UserTaskError(taskResult.Error!);
-        }
-
-        var task = taskResult.Value!;
-        _tasks.Add(task);
-
-        return task;
+        return Result<UserAddTaskError>.Success();
     }
 }
 
-public abstract record UserError : IError;
+public abstract record UserAddTaskError : IError;
 
-public sealed record EmptyEmailError : UserError;
-
-public sealed record EmptyFullNameError : UserError;
-
-public sealed record UserTaskError(TaskItemError InnerError) : UserError;
+public sealed record DuplicateTaskError(TaskItem Task) : UserAddTaskError;

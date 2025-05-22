@@ -2,36 +2,33 @@
 
 namespace Task_Manager.Task.Core.Entities;
 
-public enum TaskStatus
+public sealed class TaskItem
 {
-    Created,
-    InProgress,
-    Completed,
-}
-
-public class TaskItem
-{
-    private readonly List<TaskComment> _comments = [];
+    private readonly Dictionary<Guid, TaskComment> _comments = [];
 
     public Guid Id { get; init; }
-    public User Author { get; init; }
     public string Title { get; private set; }
     public string Description { get; private set; }
-    public TaskStatus Status { get; private set; }
-    public DateTimeOffset CreatedAt { get; init; }
-    public IReadOnlyCollection<TaskComment> Comments => _comments.AsReadOnly();
+    public string Notes { get; private set; }
+    public TaskItemStatus Status { get; init; }
+    public IReadOnlyCollection<TaskComment> Comments => _comments.Values;
 
-    private TaskItem(User author, string title, string description, DateTimeOffset createdAt)
+    private TaskItem(string title, string description, string notes, TaskItemStatus status)
     {
         Id = Guid.CreateVersion7();
-        Author = author;
         Title = title;
         Description = description;
-        Status = TaskStatus.Created;
-        CreatedAt = createdAt;
+        Notes = notes;
+        Status = status;
     }
 
-    public static Result<TaskItem, TaskItemError> TryCreate(User author, string title, string description, TimeProvider timeProvider)
+    public static Result<TaskItem, TaskItemError> TryCreate(
+        string title,
+        string description,
+        string notes,
+        DateTimeOffset? approximateCompletedAt,
+        TimeProvider timeProvider
+    )
     {
         if (string.IsNullOrWhiteSpace(title))
         {
@@ -43,21 +40,25 @@ public class TaskItem
             return new EmptyDescriptionError();
         }
 
-        return new TaskItem(author, title, description, timeProvider.GetUtcNow());
-    }
-
-    public Result<TaskComment, TaskItemError> TryCreateComment(User author, string message, TimeProvider timeProvider)
-    {
-        var commentResult = TaskComment.TryCreate(author, message, timeProvider);
-        if (commentResult.IsFailure)
+        var statusCreateResult = TaskItemStatus.TryCreate(approximateCompletedAt, timeProvider);
+        if (statusCreateResult.IsFailure)
         {
-            return new CommentError(commentResult.Error!);
+            return new TaskItemStatusCreationError(statusCreateResult.Error!);
         }
 
-        var comment = commentResult.Value!;
-        _comments.Add(comment);
+        return new TaskItem(title, description, notes, statusCreateResult.Value!);
+    }
 
-        return comment;
+    public Result<AddCommentError> TryAddComment(TaskComment comment)
+    {
+        if (_comments.ContainsKey(comment.Id))
+        {
+            return new DuplicateCommentError(comment);
+        }
+
+        _comments.Add(comment.Id, comment);
+
+        return Result<AddCommentError>.Success();
     }
 }
 
@@ -67,4 +68,8 @@ public sealed record EmptyTitleError : TaskItemError;
 
 public sealed record EmptyDescriptionError : TaskItemError;
 
-public sealed record CommentError(TaskCommentError InnerError) : TaskItemError;
+public sealed record TaskItemStatusCreationError(TaskItemStatusError InnerError) : TaskItemError;
+
+public abstract record AddCommentError : IError;
+
+public sealed record DuplicateCommentError(TaskComment Comment) : AddCommentError;
