@@ -17,7 +17,7 @@ public sealed class TaskComment
         Timestamp = timestamp;
     }
 
-    public static Result<TaskComment, TaskCommentError> TryCreate(User author, string message, TimeProvider timeProvider)
+    public static Result<TaskComment, TaskCommentCreateError> TryCreate(User author, string message, TimeProvider timeProvider)
     {
         if (string.IsNullOrWhiteSpace(message))
         {
@@ -28,6 +28,6 @@ public sealed class TaskComment
     }
 }
 
-public abstract record TaskCommentError : IError;
+public abstract record TaskCommentCreateError : IError;
 
-public sealed record EmptyMessageError : TaskCommentError;
+public sealed record EmptyMessageError : TaskCommentCreateError;

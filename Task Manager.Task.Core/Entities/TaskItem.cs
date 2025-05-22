@@ -22,7 +22,7 @@ public sealed class TaskItem
         Status = status;
     }
 
-    public static Result<TaskItem, TaskItemError> TryCreate(
+    public static Result<TaskItem, TaskItemCreateError> TryCreate(
         string title,
         string description,
         string notes,
@@ -43,7 +43,7 @@ public sealed class TaskItem
         var statusCreateResult = TaskItemStatus.TryCreate(approximateCompletedAt, timeProvider);
         if (statusCreateResult.IsFailure)
         {
-            return new TaskItemStatusCreationError(statusCreateResult.Error!);
+            return new StatusCreateError(statusCreateResult.Error!);
         }
 
         return new TaskItem(title, description, notes, statusCreateResult.Value!);
@@ -62,13 +62,13 @@ public sealed class TaskItem
     }
 }
 
-public abstract record TaskItemError : IError;
+public abstract record TaskItemCreateError : IError;
 
-public sealed record EmptyTitleError : TaskItemError;
+public sealed record EmptyTitleError : TaskItemCreateError;
 
-public sealed record EmptyDescriptionError : TaskItemError;
+public sealed record EmptyDescriptionError : TaskItemCreateError;
 
-public sealed record TaskItemStatusCreationError(TaskItemStatusError InnerError) : TaskItemError;
+public sealed record StatusCreateError(TaskItemStatusCreateError InnerError) : TaskItemCreateError;
 
 public abstract record AddCommentError : IError;
 

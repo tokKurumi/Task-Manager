@@ -13,10 +13,15 @@ public sealed class User
     public string DisplayName { get; private set; }
     public IReadOnlyCollection<TaskItem> Tasks => _tasks.Values;
 
-    public User(Guid id, string displayName)
+    private User(Guid id, string displayName)
     {
         Id = id;
         DisplayName = displayName;
+    }
+
+    public static Result<User, UserCreateError> TryCreate(Guid id, string displayName)
+    {
+        return new User(id, displayName);
     }
 
     public Result<UserAddTaskError> TryAddTask(TaskItem task)
@@ -31,6 +36,8 @@ public sealed class User
         return Result<UserAddTaskError>.Success();
     }
 }
+
+public abstract record UserCreateError : IError;
 
 public abstract record UserAddTaskError : IError;
 

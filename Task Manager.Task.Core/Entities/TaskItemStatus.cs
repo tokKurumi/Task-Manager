@@ -23,7 +23,7 @@ public sealed class TaskItemStatus
         ApproximateCompletedAt = approximateCompletedAt;
     }
 
-    public static Result<TaskItemStatus, TaskItemStatusError> TryCreate(DateTimeOffset? approximateCompletedAt, TimeProvider timeProvider)
+    public static Result<TaskItemStatus, TaskItemStatusCreateError> TryCreate(DateTimeOffset? approximateCompletedAt, TimeProvider timeProvider)
     {
         var now = timeProvider.GetUtcNow();
         if (approximateCompletedAt.HasValue && approximateCompletedAt.Value <= now)
@@ -34,7 +34,7 @@ public sealed class TaskItemStatus
         return new TaskItemStatus(now, approximateCompletedAt);
     }
 
-    public Result<InProgressTaskItemStatusError> TryMoveToInProgress()
+    public Result<MoveToInProgeressError> TryMoveToInProgress()
     {
         if (Status != TaskStatus.InProgress)
         {
@@ -44,10 +44,10 @@ public sealed class TaskItemStatus
         Status = TaskStatus.InProgress;
         CompletedAt = null;
 
-        return Result<InProgressTaskItemStatusError>.Success();
+        return Result<MoveToInProgeressError>.Success();
     }
 
-    public Result<ComplitionTaskItemStatusError> TryComplete(TimeProvider timeProvider)
+    public Result<CompleteError> TryComplete(TimeProvider timeProvider)
     {
         var now = timeProvider.GetUtcNow();
         if (now < CreatedAt)
@@ -58,18 +58,18 @@ public sealed class TaskItemStatus
         Status = TaskStatus.Completed;
         CompletedAt = now;
 
-        return Result<ComplitionTaskItemStatusError>.Success();
+        return Result<CompleteError>.Success();
     }
 }
 
-public abstract record TaskItemStatusError : IError;
+public abstract record TaskItemStatusCreateError : IError;
 
-public sealed record ApproximateCompletedAtInPastError : TaskItemStatusError;
+public sealed record ApproximateCompletedAtInPastError : TaskItemStatusCreateError;
 
-public abstract record InProgressTaskItemStatusError : IError;
+public abstract record MoveToInProgeressError : IError;
 
-public sealed record AlreadyInProgressError : InProgressTaskItemStatusError;
+public sealed record AlreadyInProgressError : MoveToInProgeressError;
 
-public abstract record ComplitionTaskItemStatusError : IError;
+public abstract record CompleteError : IError;
 
-public sealed record CompletedAtInPastError : ComplitionTaskItemStatusError;
+public sealed record CompletedAtInPastError : CompleteError;
