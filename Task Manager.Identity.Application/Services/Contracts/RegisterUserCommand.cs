@@ -5,3 +5,11 @@ public sealed record RegisterUserCommand(
     string DisplayName,
     string Password
 );
+
+public sealed record RegisterUserResponse(
+    Guid UserId,
+    string Token,
+    string RefreshToken,
+    DateTimeOffset IssuedAt,
+    TimeSpan ExpiresIn
+);
