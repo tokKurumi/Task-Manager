@@ -2,20 +2,22 @@
 
 namespace Task_Manager.Task.Core.Entities;
 
-public sealed class TaskItem
+public sealed class TaskItem : IAggregateRoot
 {
     private readonly Dictionary<Guid, TaskComment> _comments = [];
 
     public Guid Id { get; init; }
+    public Guid UserId { get; init; }
     public string Title { get; private set; }
     public string Description { get; private set; }
     public string Notes { get; private set; }
     public TaskItemStatus Status { get; init; }
     public IReadOnlyCollection<TaskComment> Comments => _comments.Values;
 
-    private TaskItem(string title, string description, string notes, TaskItemStatus status)
+    private TaskItem(Guid userId, string title, string description, string notes, TaskItemStatus status)
     {
         Id = Guid.CreateVersion7();
+        UserId = userId;
         Title = title;
         Description = description;
         Notes = notes;
@@ -23,6 +25,7 @@ public sealed class TaskItem
     }
 
     public static Result<TaskItem, TaskItemCreateError> TryCreate(
+        Guid userId,
         string title,
         string description,
         string notes,
@@ -30,6 +33,11 @@ public sealed class TaskItem
         TimeProvider timeProvider
     )
     {
+        if (userId == Guid.Empty)
+        {
+            return new InvalidUserIdError();
+        }
+
         if (string.IsNullOrWhiteSpace(title))
         {
             return new EmptyTitleError();
@@ -46,7 +54,7 @@ public sealed class TaskItem
             return new StatusCreateError(statusCreateResult.Error!);
         }
 
-        return new TaskItem(title, description, notes, statusCreateResult.Value!);
+        return new TaskItem(userId, title, description, notes, statusCreateResult.Value!);
     }
 
     public Result<AddCommentError> TryAddComment(TaskComment comment)
@@ -63,6 +71,8 @@ public sealed class TaskItem
 }
 
 public abstract record TaskItemCreateError : IError;
+
+public sealed record InvalidUserIdError : TaskItemCreateError;
 
 public sealed record EmptyTitleError : TaskItemCreateError;
 

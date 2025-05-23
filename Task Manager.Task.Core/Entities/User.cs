@@ -3,15 +3,12 @@
 namespace Task_Manager.Task.Core.Entities;
 
 // projection of user from Identity micro-service
-public sealed class User
+public sealed class User : IAggregateRoot
 {
-    private readonly Dictionary<Guid, TaskItem> _tasks = [];
-
     // entire application unique identifier,
     // which controls under Identity micro-service
     public Guid Id { get; init; }
     public string DisplayName { get; private set; }
-    public IReadOnlyCollection<TaskItem> Tasks => _tasks.Values;
 
     private User(Guid id, string displayName)
     {
@@ -22,18 +19,6 @@ public sealed class User
     public static Result<User, UserCreateError> TryCreate(Guid id, string displayName)
     {
         return new User(id, displayName);
-    }
-
-    public Result<UserAddTaskError> TryAddTask(TaskItem task)
-    {
-        if (_tasks.ContainsKey(task.Id))
-        {
-            return new DuplicateTaskError(task);
-        }
-
-        _tasks.Add(task.Id, task);
-
-        return Result<UserAddTaskError>.Success();
     }
 }
 
