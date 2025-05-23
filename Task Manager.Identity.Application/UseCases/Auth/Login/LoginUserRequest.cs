@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Mediator;
 using Task_Manager.Common;
-using Task_Manager.Identity.Application.Services.Abstractions;
+using Task_Manager.Identity.Application.Services;
 
 namespace Task_Manager.Identity.Application.UseCases.Auth.Login;
 

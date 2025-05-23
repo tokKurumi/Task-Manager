@@ -1,10 +1,17 @@
 ﻿using Task_Manager.Common;
-using Task_Manager.Identity.Application.Jwt;
 using Task_Manager.Identity.Application.Services.Abstractions;
 using Task_Manager.Identity.Application.Services.Contracts;
 using Task_Manager.Identity.Core.Entities;
 
 namespace Task_Manager.Identity.Application.Services;
+
+public interface IAuthService
+{
+    Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserCommand request, CancellationToken cancellationToken = default);
+    Task<Result<LoginUserResponse, AuthError>> LoginAsync(LoginUserRequest request, CancellationToken cancellationToken = default);
+}
+
+public abstract record AuthError : IError;
 
 public class AuthService(
     IApplicationUserRepository userRepository,

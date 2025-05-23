@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Identity.Application.Jwt;
+﻿namespace Task_Manager.Identity.Application.Services.Contracts;
 
 public sealed record JwtToken(
     string AccessToken,

@@ -3,7 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Task_Manager.Identity.Application.Jwt;
+using Task_Manager.Identity.Application.Services.Abstractions;
+using Task_Manager.Identity.Application.Services.Contracts;
 using Task_Manager.Identity.Core.Entities;
 using Task_Manager.Integrations;
 
