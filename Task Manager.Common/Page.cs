@@ -1,35 +1,33 @@
-﻿namespace Task_Manager.Common;
+﻿using System.Collections;
 
-public class Page<T>
+namespace Task_Manager.Common;
+
+public sealed record Page<T> : IReadOnlyCollection<T>
 {
-    public IReadOnlyCollection<T> Items { get; }
-    public int PageNumber { get; }
-    public int PageSize { get; }
-    public long TotalItems { get; }
+    public IReadOnlyCollection<T> Items { get; init; }
+    public int PageNumber { get; init; }
+    public int PageSize { get; init; }
+    public long TotalItems { get; init; }
+
     public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
     public bool HasPreviousPage => PageNumber > 1;
     public bool HasNextPage => PageNumber < TotalPages;
+    public int Count => Items.Count;
+    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public Page(IEnumerable<T> items, int pageNumber, int pageSize, long totalItems)
     {
-        if (pageNumber < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than or equal to 1.");
-        }
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageNumber, 1);
+        ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
+        ArgumentOutOfRangeException.ThrowIfNegative(totalItems);
 
-        if (pageSize < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than or equal to 1.");
-        }
-
-        if (totalItems < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(totalItems), "Total items cannot be negative.");
-        }
-
-        Items = items?.ToList().AsReadOnly() ?? throw new ArgumentNullException(nameof(items));
+        Items = items.ToList().AsReadOnly();
         PageNumber = pageNumber;
         PageSize = pageSize;
         TotalItems = totalItems;
     }
+
+    public Page(IEnumerable<T> items, IPagination pagination, long totalItems)
+        : this(items, pagination.Page, pagination.PageSize, totalItems) { }
 }
