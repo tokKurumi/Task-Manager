@@ -9,7 +9,7 @@ public interface IApplicationUserRepository
     Task<bool> IsUniqueEmail(string email, CancellationToken cancellationToken = default);
     Task<Result<ApplicationUser?, ApplicationUserRepositoryError>> FindByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<Result<ApplicationUser?, ApplicationUserRepositoryError>> FindByIdAsync(Guid userId, CancellationToken cancellationToken = default);
-    Task<Result<Page<ApplicationUser>, ApplicationUserRepositoryError>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<Result<Page<ApplicationUser>, ApplicationUserRepositoryError>> GetPageAsync(Pagination pagination, CancellationToken cancellationToken = default);
 }
 
 public abstract record ApplicationUserRepositoryError : IError;

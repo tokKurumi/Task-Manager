@@ -73,11 +73,11 @@ public class ApplicationUserRepository(
         return domainModelMapResult.Value;
     }
 
-    public async Task<Result<Page<ApplicationUser>, ApplicationUserRepositoryError>> GetPageAsync(int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<Result<Page<ApplicationUser>, ApplicationUserRepositoryError>> GetPageAsync(Pagination pagination, CancellationToken cancellationToken = default)
     {
         var identityUsers = await _userManager.Users
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Skip((pagination.Page - 1) * pagination.PageSize)
+            .Take(pagination.PageSize)
             .ToListAsync(cancellationToken);
 
         var totalCount = await _userManager.Users.CountAsync(cancellationToken);
@@ -90,7 +90,7 @@ public class ApplicationUserRepository(
 
         var domainModels = domainModelMapResults.Select(result => result.Value!).ToList();
 
-        return new Page<ApplicationUser>(domainModels, pageNumber, pageSize, totalCount);
+        return new Page<ApplicationUser>(domainModels, pagination.Page, pagination.PageSize, totalCount);
     }
 }
 
