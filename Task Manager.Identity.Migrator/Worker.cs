@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Trace;
 using System.Diagnostics;
 using Task_Manager.Identity.Infrastructure.Data;
 
@@ -28,7 +27,7 @@ public class Worker(
         }
         catch (Exception ex)
         {
-            activity?.RecordException(ex);
+            activity?.AddException(ex);
             throw;
         }
 
