@@ -2,8 +2,9 @@
 
 namespace Task_Manager.Task.Core.Entities;
 
-public sealed class TaskItem : IAggregateRoot
+public sealed class TaskItem : IDomainModel, IAggregateRoot
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
     private readonly Dictionary<Guid, TaskComment> _comments = [];
 
     public Guid Id { get; init; }
@@ -13,6 +14,7 @@ public sealed class TaskItem : IAggregateRoot
     public string Notes { get; private set; }
     public TaskItemStatus Status { get; init; }
     public IReadOnlyCollection<TaskComment> Comments => _comments.Values;
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private TaskItem(Guid userId, string title, string description, string notes, TaskItemStatus status)
     {

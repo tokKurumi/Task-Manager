@@ -9,12 +9,15 @@ public enum TaskStatus
     Completed,
 }
 
-public sealed class TaskItemStatus
+public sealed class TaskItemStatus : IDomainModel
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     public TaskStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset? ApproximateCompletedAt { get; private set; }
     public DateTimeOffset? CompletedAt { get; private set; }
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private TaskItemStatus(DateTimeOffset createdAt, DateTimeOffset? approximateCompletedAt)
     {

@@ -2,12 +2,15 @@
 
 namespace Task_Manager.Task.Core.Entities;
 
-public sealed class TaskComment
+public sealed class TaskComment : IDomainModel
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     public Guid Id { get; init; }
     public User Author { get; init; }
     public string Message { get; init; }
     public DateTimeOffset Timestamp { get; init; }
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private TaskComment(User author, string message, DateTimeOffset timestamp)
     {

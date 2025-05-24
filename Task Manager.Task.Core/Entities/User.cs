@@ -3,12 +3,15 @@
 namespace Task_Manager.Task.Core.Entities;
 
 // projection of user from Identity micro-service
-public sealed class User : IAggregateRoot
+public sealed class User : IDomainModel, IAggregateRoot
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     // entire application unique identifier,
     // which controls under Identity micro-service
     public Guid Id { get; init; }
     public string DisplayName { get; private set; }
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private User(Guid id, string displayName)
     {
