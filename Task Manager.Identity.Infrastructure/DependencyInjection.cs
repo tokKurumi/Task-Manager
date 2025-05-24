@@ -31,6 +31,8 @@ public static class DependencyInjection
 
     private static IHostApplicationBuilder AddRepositories(this IHostApplicationBuilder builder)
     {
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
         return builder;
@@ -61,7 +63,6 @@ public static class DependencyInjection
 
     private static IHostApplicationBuilder AddMessaging(this IHostApplicationBuilder builder)
     {
-        //builder.AddRabbitMQClient(Integrations.MessageBroker.RabbitMQ);
         builder.AddMassTransitRabbitMq(Integrations.MessageBroker.RabbitMQ);
 
         builder.Services.AddScoped<IDomainEventPublisher, RabbitMqDomainEventPublisher>();
