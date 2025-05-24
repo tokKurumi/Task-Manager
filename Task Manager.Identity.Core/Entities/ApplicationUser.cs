@@ -10,7 +10,7 @@ public interface IUserData
     DateTimeOffset CreatedAt { get; }
 }
 
-public class ApplicationUser
+public sealed class ApplicationUser : IDomainModel
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
