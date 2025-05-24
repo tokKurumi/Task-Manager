@@ -14,16 +14,24 @@ public static class DependencyInjection
     public static IHostApplicationBuilder AddInfrastructure(this IHostApplicationBuilder builder)
     {
         return builder
+            .AddServices()
             .AddRepositories()
-            .AddIdentityDbContext();
+            .AddIdentityDbContext()
+            .AddMessaging();
+    }
+
+    public static IHostApplicationBuilder AddServices(this IHostApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IPasswordPolicyValidator, IdentityPasswordPolicyValidator>();
+        builder.Services.AddScoped<IPasswordService, PasswordService>();
+        builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        return builder;
     }
 
     private static IHostApplicationBuilder AddRepositories(this IHostApplicationBuilder builder)
     {
         builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
-        builder.Services.AddScoped<IPasswordPolicyValidator, IdentityPasswordPolicyValidator>();
-        builder.Services.AddScoped<IPasswordService, PasswordService>();
-        builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return builder;
     }
@@ -47,6 +55,16 @@ public static class DependencyInjection
         .AddTokenProvider<DataProtectorTokenProvider<UserEntity>>("Default");
 
         builder.Services.AddScoped<RoleManager<IdentityRole<Guid>>>();
+
+        return builder;
+    }
+
+    private static IHostApplicationBuilder AddMessaging(this IHostApplicationBuilder builder)
+    {
+        //builder.AddRabbitMQClient(Integrations.MessageBroker.RabbitMQ);
+        builder.AddMassTransitRabbitMq(Integrations.MessageBroker.RabbitMQ);
+
+        builder.Services.AddScoped<IDomainEventPublisher, RabbitMqDomainEventPublisher>();
 
         return builder;
     }
