@@ -8,6 +8,7 @@ public interface ITaskItemRepository : IGenericRepository<TaskItem, TaskItemRepo
     Task<Result<TaskComment, TaskItemCommentRepositoryError>> AddCommentAsync(Guid taskId, TaskComment comment, CancellationToken cancellationToken = default);
     Task<Result<TaskComment, TaskItemCommentRepositoryError>> GetCommentByIdAsync(Guid taskId, Guid commentId, CancellationToken cancellationToken = default);
     Task<Result<Page<TaskComment>, TaskItemCommentRepositoryError>> GetCommentsPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default);
+    Task<Result<TaskComment, TaskItemCommentRepositoryError>> UpdateCommentAsync(TaskComment comment, CancellationToken cancellationToken = default);
     Task<Result<TaskItemCommentRepositoryError>> DeleteCommentAsync(Guid taskId, Guid commentId, CancellationToken cancellationToken = default);
 }
 
