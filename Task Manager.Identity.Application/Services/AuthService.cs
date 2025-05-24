@@ -88,13 +88,13 @@ public class AuthService(
 
         var jwtToken = _jwtTokenGenerator.GenerateToken(createdUser);
 
-        return new RegisterUserResponse(createdUser.Id, jwtToken.AccessToken, jwtToken.RefreshToken, jwtToken.IssuedAt, jwtToken.ExpiresIn);
+        return new RegisterUserResponse(createdUser, jwtToken.AccessToken, jwtToken.RefreshToken, jwtToken.IssuedAt, jwtToken.ExpiresIn);
     }
 }
 
 public sealed record UserAlreadyExistError(string Email) : AuthError;
 
-public sealed record CreationUserError(ApplicationUserError InnerError) : AuthError;
+public sealed record CreationUserError(CreateApplicationUserError InnerError) : AuthError;
 
 public sealed record RepositoryCreateUserError(ApplicationUserRepositoryError InnerError) : AuthError;
 

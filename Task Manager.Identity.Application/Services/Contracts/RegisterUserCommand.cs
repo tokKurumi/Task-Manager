@@ -1,4 +1,6 @@
-﻿namespace Task_Manager.Identity.Application.Services.Contracts;
+﻿using Task_Manager.Identity.Core.Entities;
+
+namespace Task_Manager.Identity.Application.Services.Contracts;
 
 public sealed record RegisterUserCommand(
     string Email,
@@ -7,7 +9,7 @@ public sealed record RegisterUserCommand(
 );
 
 public sealed record RegisterUserResponse(
-    Guid UserId,
+    ApplicationUser User,
     string Token,
     string RefreshToken,
     DateTimeOffset IssuedAt,

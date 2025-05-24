@@ -12,10 +12,13 @@ public interface IUserData
 
 public class ApplicationUser
 {
+    private readonly List<IDomainEvent> _domainEvents = [];
+
     public Guid Id { get; init; }
     public string Email { get; init; }
     public string DisplayName { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
+    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private ApplicationUser(string email, string displayName, DateTimeOffset createdAt)
     {
@@ -33,7 +36,7 @@ public class ApplicationUser
         CreatedAt = createdAt;
     }
 
-    public static Result<ApplicationUser, ApplicationUserError> TryCreate(string email, string displayName, TimeProvider timeProvider)
+    public static Result<ApplicationUser, CreateApplicationUserError> TryCreate(string email, string displayName, TimeProvider timeProvider)
     {
         if (string.IsNullOrWhiteSpace(email))
         {
@@ -45,10 +48,13 @@ public class ApplicationUser
             return new EmptyDisplayNameError();
         }
 
-        return new ApplicationUser(email, displayName, timeProvider.GetUtcNow());
+        var user = new ApplicationUser(email, displayName, timeProvider.GetUtcNow());
+        user._domainEvents.Add(new UserCreateDomainEvent(user.Id, user.Email, user.DisplayName, user.CreatedAt));
+
+        return user;
     }
 
-    public static Result<ApplicationUser, ApplicationUserError> TryCreate(IUserData userData, TimeProvider timeProvider)
+    public static Result<ApplicationUser, CreateApplicationUserError> TryConvertFromData(IUserData userData)
     {
         if (string.IsNullOrWhiteSpace(userData.Email))
         {
@@ -64,10 +70,12 @@ public class ApplicationUser
     }
 }
 
-public abstract record ApplicationUserError : IError;
+public abstract record CreateApplicationUserError : IError;
 
-public sealed record EmptyEmailError : ApplicationUserError;
+public sealed record EmptyEmailError : CreateApplicationUserError;
 
-public sealed record EmptyDisplayNameError : ApplicationUserError;
+public sealed record EmptyDisplayNameError : CreateApplicationUserError;
 
-public sealed record EmptyPasswordHashError : ApplicationUserError;
+public sealed record EmptyPasswordHashError : CreateApplicationUserError;
+
+public sealed record UserCreateDomainEvent(Guid Id, string Email, string DisplayName, DateTimeOffset CreatedAt) : IDomainEvent;

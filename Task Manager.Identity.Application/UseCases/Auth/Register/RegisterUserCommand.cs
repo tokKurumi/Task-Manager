@@ -3,6 +3,7 @@ using Mediator;
 using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services;
 using Task_Manager.Identity.Application.Services.Abstractions;
+using Task_Manager.Identity.Core.Entities;
 
 namespace Task_Manager.Identity.Application.UseCases.Auth.Register;
 
@@ -13,7 +14,7 @@ public sealed record RegisterUserCommand(
 ) : ICommand<Result<RegisterUserResponse, OneOfError<AuthError, ValidationError>>>;
 
 public sealed record RegisterUserResponse(
-    Guid UserId,
+    ApplicationUser User,
     string Token,
     string RefreshToken,
     DateTimeOffset IssuedAt,
