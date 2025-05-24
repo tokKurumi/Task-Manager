@@ -17,10 +17,10 @@ public sealed record OneOfError<TError1, TError2>(
         => new(OneOf<TError1, TError2>.FromT1(error));
 }
 
-public abstract class ResultBase<TError>
+public sealed class Result<TError>
     where TError : IError
 {
-    protected TError? _error;
+    private TError? _error;
 
     public bool IsSuccess { get; init; }
     public bool IsFailure => !IsSuccess;
@@ -28,18 +28,11 @@ public abstract class ResultBase<TError>
     public TError? Error
     {
         get => IsFailure ? _error : throw new InvalidOperationException("Result is successful.");
-        protected set => _error = value;
+        private set => _error = value;
     }
 
-    protected ResultBase(bool isSuccess, TError? error)
-        => (IsSuccess, Error) = (isSuccess, error);
-}
-
-public sealed class Result<TError> : ResultBase<TError>
-    where TError : IError
-{
     private Result(bool isSuccess, TError? error)
-        : base(isSuccess, error) { }
+        => (IsSuccess, Error) = (isSuccess, error);
 
     public static Result<TError> Success()
         => new(true, default);
@@ -47,20 +40,51 @@ public sealed class Result<TError> : ResultBase<TError>
     public static Result<TError> Failure(TError error)
         => new(false, error);
 
+    public static implicit operator Result<TError>(TError error) => Failure(error);
+
     public Result<TNewError> MapError<TNewError>(Func<TError, TNewError> map)
         where TNewError : IError
         => IsSuccess
             ? Result<TNewError>.Success()
             : Result<TNewError>.Failure(map(Error!));
 
-    public static implicit operator Result<TError>(TError error) => Failure(error);
+    public Result<TError> Bind(Func<Result<TError>> binder)
+        => IsSuccess
+            ? binder()
+            : Result<TError>.Failure(Error!);
+
+    public TResult Match<TResult>(Func<TResult> onSuccess, Func<TError, TResult> onFailure)
+        => IsSuccess
+            ? onSuccess()
+            : onFailure(Error!);
+
+    public Result<TError> Tap(Action onSuccess)
+    {
+        if (IsSuccess)
+        {
+            onSuccess();
+        }
+
+        return this;
+    }
+
+    public Result<TError> TapError(Action<TError> onError)
+    {
+        if (IsFailure)
+        {
+            onError(Error!);
+        }
+
+        return this;
+    }
 }
 
-public abstract class ResultBase<T, TError>
+
+public sealed class Result<T, TError>
     where TError : IError
 {
-    protected T? _value;
-    protected TError? _error;
+    private T? _value;
+    private TError? _error;
 
     public bool IsSuccess { get; init; }
     public bool IsFailure => !IsSuccess;
@@ -68,24 +92,16 @@ public abstract class ResultBase<T, TError>
     public T? Value
     {
         get => IsSuccess ? _value : throw new InvalidOperationException("Result is not successful.");
-        protected set => _value = value;
+        private set => _value = value;
     }
     public TError? Error
     {
         get => IsFailure ? _error : throw new InvalidOperationException("Result is successful.");
-        protected set => _error = value;
+        private set => _error = value;
     }
 
-    protected ResultBase(bool isSuccess, T? value, TError? error)
-        => (IsSuccess, Value, Error) = (isSuccess, value, error);
-}
-
-public sealed class Result<T, TError> : ResultBase<T, TError>
-    where TError : IError
-{
     private Result(bool isSuccess, T? value, TError? error)
-        : base(isSuccess, value, error)
-    { }
+        => (IsSuccess, Value, Error) = (isSuccess, value, error);
 
     public static Result<T, TError> Success(T value)
         => new(true, value, default);
@@ -99,8 +115,10 @@ public sealed class Result<T, TError> : ResultBase<T, TError>
 
     public static explicit operator T(Result<T, TError> result) => result.Value!;
 
-    public Result<TResult, TError> Map<TResult>(Func<T, TResult> mapper) =>
-        IsSuccess ? Result<TResult, TError>.Success(mapper(Value!)) : Result<TResult, TError>.Failure(Error!);
+    public Result<TResult, TError> Map<TResult>(Func<T, TResult> mapper)
+        => IsSuccess
+            ? Result<TResult, TError>.Success(mapper(Value!))
+            : Result<TResult, TError>.Failure(Error!);
 
     public Result<T, TNewError> MapError<TNewError>(Func<TError, TNewError> map)
         where TNewError : IError
@@ -108,17 +126,31 @@ public sealed class Result<T, TError> : ResultBase<T, TError>
             ? Result<T, TNewError>.Success(Value!)
             : Result<T, TNewError>.Failure(map(Error!));
 
-    public Result<TResult, TError> Bind<TResult>(Func<T, Result<TResult, TError>> binder) =>
-        IsSuccess ? binder(Value!) : Result<TResult, TError>.Failure(Error!);
+    public Result<TResult, TError> Bind<TResult>(Func<T, Result<TResult, TError>> binder)
+        => IsSuccess
+            ? binder(Value!)
+            : Result<TResult, TError>.Failure(Error!);
 
-    public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<TError, TResult> onFailure) =>
-        IsSuccess ? onSuccess(Value!) : onFailure(Error!);
+    public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<TError, TResult> onFailure)
+        => IsSuccess
+            ? onSuccess(Value!)
+            : onFailure(Error!);
 
     public Result<T, TError> Tap(Action<T> onSuccess)
     {
         if (IsSuccess)
         {
             onSuccess(Value!);
+        }
+
+        return this;
+    }
+
+    public Result<T, TError> TapError(Action<TError> onError)
+    {
+        if (IsFailure)
+        {
+            onError(Error!);
         }
 
         return this;
