@@ -7,30 +7,28 @@ using Task_Manager.Common;
 
 namespace Task_Manager.Identity.Application;
 
-public abstract class ValidationBehaviorBase<TMessage, TResponse>(
+public sealed class ValidationBehaviour<TMessage, TResponse>(
     ActivitySource activitySource,
     IEnumerable<IValidator<TMessage>> validators,
     IValidationErrorFactory<TResponse> errorFactory
 ) : IPipelineBehavior<TMessage, TResponse>
-    where TMessage : notnull, IMessage
-    where TResponse : notnull
+    where TMessage : IMessage
 {
-    protected readonly ActivitySource _activitySource = activitySource;
-    protected readonly IEnumerable<IValidator<TMessage>> _validators = validators;
+    private readonly ActivitySource _activitySource = activitySource;
+    private readonly IEnumerable<IValidator<TMessage>> _validators = validators;
     private readonly IValidationErrorFactory<TResponse> _errorFactory = errorFactory;
 
     public async ValueTask<TResponse> Handle(
         TMessage message,
         CancellationToken cancellationToken,
-        MessageHandlerDelegate<TMessage, TResponse> next
-    )
+        MessageHandlerDelegate<TMessage, TResponse> next)
     {
         if (!_validators.Any())
         {
             return await next(message, cancellationToken);
         }
 
-        using var activity = _activitySource.StartActivity($"Validating {typeof(TMessage).Name}");
+        using var activity = _activitySource.StartActivity($"ValidationBehaviour {typeof(TMessage).Name}");
 
         var context = new ValidationContext<TMessage>(message);
         var validationResults = await Task.WhenAll(
@@ -53,22 +51,6 @@ public abstract class ValidationBehaviorBase<TMessage, TResponse>(
         return _errorFactory.Create(error);
     }
 }
-
-public class RequestValidationBehavior<TMessage, TResponse>(
-    ActivitySource activitySource,
-    IEnumerable<IValidator<TMessage>> validators,
-    IValidationErrorFactory<TResponse> errorFactory
-) : ValidationBehaviorBase<TMessage, TResponse>(activitySource, validators, errorFactory)
-    where TMessage : notnull, IRequest<TResponse>
-    where TResponse : notnull;
-
-public class CommandValidationBehavior<TMessage, TResponse>(
-    ActivitySource activitySource,
-    IEnumerable<IValidator<TMessage>> validators,
-    IValidationErrorFactory<TResponse> errorFactory
-) : ValidationBehaviorBase<TMessage, TResponse>(activitySource, validators, errorFactory)
-    where TMessage : notnull, ICommand<TResponse>
-    where TResponse : notnull;
 
 [Mapper]
 public static partial class ValidationFailureMapper

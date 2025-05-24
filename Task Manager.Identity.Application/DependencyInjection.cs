@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services;
-using Task_Manager.Identity.Application.Services.Abstractions;
 
 namespace Task_Manager.Identity.Application;
 
@@ -40,8 +39,7 @@ public static class DependencyInjection
             config.ServiceLifetime = ServiceLifetime.Scoped;
         });
 
-        builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
-        builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(CommandValidationBehavior<,>));
+        builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 
         builder.Services.AddValiadtionFactories();
 
