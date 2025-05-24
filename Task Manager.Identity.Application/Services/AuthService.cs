@@ -54,14 +54,8 @@ public class AuthService(
 
     public async Task<Result<RegisterUserResponse, AuthError>> RegisterAsync(RegisterUserCommand request, CancellationToken cancellationToken = default)
     {
-        var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
-        if (userFindResult.IsFailure)
-        {
-            return new RepositoryCreateUserError(userFindResult.Error!);
-        }
-
-        var foundUser = userFindResult.Value;
-        if (foundUser is not null)
+        var uniqueEmail = await _userRepository.IsUniqueEmail(request.Email, cancellationToken);
+        if (!uniqueEmail)
         {
             return new UserAlreadyExistError(request.Email);
         }

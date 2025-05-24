@@ -2,7 +2,6 @@
 using Mediator;
 using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services;
-using Task_Manager.Identity.Application.Services.Abstractions;
 using Task_Manager.Identity.Core.Entities;
 
 namespace Task_Manager.Identity.Application.UseCases.Auth.Register;
@@ -26,14 +25,11 @@ public sealed record RegisterUserResponse(
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {
-    public RegisterUserCommandValidator(
-        IApplicationUserRepository userRepository
-    )
+    public RegisterUserCommandValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty().WithMessage("Email should not be empty.")
-            .EmailAddress().WithMessage("Invalid email format.")
-            .MustAsync(userRepository.IsUniqueEmail).WithMessage("This email is taken.");
+            .EmailAddress().WithMessage("Invalid email format.");
 
         RuleFor(x => x.DisplayName)
             .NotEmpty().WithMessage("Display name should not be empty.");
