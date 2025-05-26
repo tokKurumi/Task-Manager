@@ -8,12 +8,12 @@
     <Project Path="Task Manager.Identity.Migrator/Task Manager.Identity.Migrator.csproj" />
     <Project Path="Task Manager.Identity.Tests/Task Manager.Identity.Tests.csproj" />
   </Folder>
-  <Folder Name="/Services/Task/">
-    <Project Path="Task Manager.Task.Application/Task Manager.Task.Application.csproj" />
-    <Project Path="Task Manager.Task.Core/Task Manager.Task.Core.csproj" />
-    <Project Path="Task Manager.Task.Infrastructure/Task Manager.Task.Infrastructure.csproj" />
-    <Project Path="Task Manager.Task.TaskAPI/Task Manager.Task.TaskAPI.csproj" />
-    <Project Path="Task Manager.Task.Tests/Task Manager.Task.Tests.csproj" />
+  <Folder Name="/Services/TaskManagement/">
+    <Project Path="Task Manager.TaskManagement.Application/Task Manager.TaskManagement.Application.csproj" />
+    <Project Path="Task Manager.TaskManagement.Core/Task Manager.TaskManagement.Core.csproj" />
+    <Project Path="Task Manager.TaskManagement.Infrastructure/Task Manager.TaskManagement.Infrastructure.csproj" />
+    <Project Path="Task Manager.TaskManagement.TaskAPI/Task Manager.TaskManagement.TaskAPI.csproj" />
+    <Project Path="Task Manager.TaskManagement.Tests/Task Manager.TaskManagement.Tests.csproj" />
   </Folder>
   <Project Path="Task Manager.AppHost/Task Manager.AppHost.csproj" />
   <Project Path="Task Manager.Common/Task Manager.Common.csproj" />

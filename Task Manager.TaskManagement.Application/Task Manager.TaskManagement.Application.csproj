@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>Task_Manager.Task.Application</RootNamespace>
+    <RootNamespace>Task_Manager.TaskManagement.Application</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Task Manager.Task.Core\Task Manager.Task.Core.csproj" />
+    <ProjectReference Include="..\Task Manager.TaskManagement.Core\Task Manager.TaskManagement.Core.csproj" />
   </ItemGroup>
 
 </Project>

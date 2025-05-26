@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Task.Application.Services.Contracts;
+﻿namespace Task_Manager.TaskManagement.Application.Services.Contracts;
 
 public record UpdateTaskCommand(
     Guid UserPerformerId,

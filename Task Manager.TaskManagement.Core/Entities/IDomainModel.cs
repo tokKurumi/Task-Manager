@@ -1,4 +1,4 @@
-﻿namespace Task_Manager.Task.Core.Entities;
+﻿namespace Task_Manager.TaskManagement.Core.Entities;
 
 public interface IDomainModel
 {

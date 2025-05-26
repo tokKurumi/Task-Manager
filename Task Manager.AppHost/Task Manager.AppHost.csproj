@@ -21,7 +21,7 @@
     <ProjectReference Include="..\Task Manager.Identity.Migrator\Task Manager.Identity.Migrator.csproj" />
     <ProjectReference Include="..\Task Manager.Integrations\Task Manager.Integrations.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\Task Manager.Identity.IdentityAPI\Task Manager.Identity.IdentityAPI.csproj" />
-    <ProjectReference Include="..\Task Manager.Task.TaskAPI\Task Manager.Task.TaskAPI.csproj" />
+    <ProjectReference Include="..\Task Manager.TaskManagement.TaskAPI\Task Manager.TaskManagement.TaskAPI.csproj" />
   </ItemGroup>
 
 </Project>

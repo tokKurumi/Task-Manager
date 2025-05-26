@@ -1,7 +1,7 @@
 ﻿using Task_Manager.Common;
-using Task_Manager.Task.Core.Entities;
+using Task_Manager.TaskManagement.Core.Entities;
 
-namespace Task_Manager.Task.Application.Services.Abstractions;
+namespace Task_Manager.TaskManagement.Application.Services.Abstractions;
 
 public interface ITaskItemRepository : IGenericRepository<TaskItem, TaskItemRepositoryError>
 {

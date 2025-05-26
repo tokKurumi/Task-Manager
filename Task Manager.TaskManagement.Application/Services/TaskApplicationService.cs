@@ -1,10 +1,9 @@
 ﻿using Task_Manager.Common;
-using Task_Manager.Task.Application.Services.Abstractions;
-using Task_Manager.Task.Application.Services.Contracts;
-using Task_Manager.Task.Core.Entities;
-using System.Threading.Tasks;
+using Task_Manager.TaskManagement.Application.Services.Abstractions;
+using Task_Manager.TaskManagement.Application.Services.Contracts;
+using Task_Manager.TaskManagement.Core.Entities;
 
-namespace Task_Manager.Task.Application.Services;
+namespace Task_Manager.TaskManagement.Application.Services;
 
 public abstract record TaskApplicationError : IError;
 public abstract record TaskCommentApplicationError : TaskApplicationError;

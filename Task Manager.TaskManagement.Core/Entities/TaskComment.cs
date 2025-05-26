@@ -1,6 +1,6 @@
 ﻿using Task_Manager.Common;
 
-namespace Task_Manager.Task.Core.Entities;
+namespace Task_Manager.TaskManagement.Core.Entities;
 
 public sealed class TaskComment : IDomainModel
 {
