@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
+builder.AddAuth();
+
 if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
