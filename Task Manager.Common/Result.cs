@@ -156,3 +156,358 @@ public sealed class Result<T, TError>
         return this;
     }
 }
+
+public static class AsyncResultExtensions
+{
+    #region Bind & BindAsync
+    public static async Task<Result<TError>> Bind<TError>(
+        this Task<Result<TError>> taskResult,
+        Func<Result<TError>> binder
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            return binder();
+        }
+        return Result<TError>.Failure(result.Error!);
+    }
+
+    public static async Task<Result<TResult, TError>> Bind<T, TError, TResult>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, Result<TResult, TError>> binder
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            return binder(result.Value!);
+        }
+        return Result<TResult, TError>.Failure(result.Error!);
+    }
+
+    public static async Task<Result<TError>> BindAsync<TError>(
+        this Task<Result<TError>> taskResult,
+        Func<Task<Result<TError>>> binder
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            return await binder();
+        }
+        return Result<TError>.Failure(result.Error!);
+    }
+
+    public static async Task<Result<TResult, TError>> BindAsync<T, TError, TResult>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, Task<Result<TResult, TError>>> binder
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            return await binder(result.Value!);
+        }
+        return Result<TResult, TError>.Failure(result.Error!);
+    }
+
+    //public static async Task<Result<TResult, TError>> BindAsync<T, TError, TResult>(
+    //    this Task<Result<T, TError>> taskResult,
+    //    Func<T, Task<Result<TResult, TError>>> binder
+    //)
+    //    where TError : IError
+    //{
+    //    var result = await taskResult;
+    //    if (result.IsSuccess)
+    //    {
+    //        return await binder(result.Value);
+    //    }
+    //    return Result<TResult, TError>.Failure(result.Error!);
+    //}
+
+    #endregion
+
+    #region Map & MapAsync
+    public static async Task<Result<TNew, TError>> Map<T, TError, TNew>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, TNew> mapper
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<TNew, TError>.Success(mapper(result.Value!))
+            : Result<TNew, TError>.Failure(result.Error!);
+    }
+
+    public static async Task<Result<TResult, TError>> MapAsync<T, TError, TResult>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, Task<TResult>> mapper
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<TResult, TError>.Success(await mapper(result.Value!))
+            : Result<TResult, TError>.Failure(result.Error!);
+    }
+    #endregion
+
+    #region MapError & MapErrorAsync
+    public static async Task<Result<TNewError>> MapError<TError, TNewError>(
+        this Task<Result<TError>> taskResult,
+        Func<TError, TNewError> map
+    )
+        where TError : IError
+        where TNewError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<TNewError>.Success()
+            : Result<TNewError>.Failure(map(result.Error!));
+    }
+
+    public static async Task<Result<T, TNewError>> MapError<T, TError, TNewError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<TError, TNewError> map
+    )
+        where TError : IError
+        where TNewError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<T, TNewError>.Success(result.Value!)
+            : Result<T, TNewError>.Failure(map(result.Error!));
+    }
+
+    public static async Task<Result<TNewError>> MapErrorAsync<TError, TNewError>(
+        this Task<Result<TError>> taskResult,
+        Func<TError, Task<TNewError>> map
+    )
+        where TError : IError
+        where TNewError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<TNewError>.Success()
+            : Result<TNewError>.Failure(await map(result.Error!));
+    }
+
+    public static async Task<Result<T, TNewError>> MapErrorAsync<T, TError, TNewError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<TError, Task<TNewError>> map
+    )
+        where TError : IError
+        where TNewError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<T, TNewError>.Success(result.Value!)
+            : Result<T, TNewError>.Failure(await map(result.Error!));
+    }
+    #endregion
+
+    #region Tap & TapAsync
+    public static async Task<Result<TError>> Tap<TError>(
+        this Task<Result<TError>> taskResult,
+        Action onSuccess
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            onSuccess();
+        }
+        return result;
+    }
+
+    public static async Task<Result<T, TError>> Tap<T, TError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, Action> onSuccess
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            onSuccess(result.Value!);
+        }
+        return result;
+    }
+
+    public static async Task<Result<TError>> TapAsync<TError>(
+        this Task<Result<TError>> taskResult,
+        Func<Task> onSuccess
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            await onSuccess();
+        }
+        return result;
+    }
+
+    public static async Task<Result<T, TError>> TapAsync<T, TError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, Task> onSuccess
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsSuccess)
+        {
+            await onSuccess(result.Value!);
+        }
+        return result;
+    }
+    #endregion
+
+    #region TapError & TapErrorAsync
+    public static async Task<Result<TError>> TapError<TError>(
+        this Task<Result<TError>> taskResult,
+        Func<TError, Action> onError
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            onError(result.Error!);
+        }
+        return result;
+    }
+
+    public static async Task<Result<T, TError>> TapError<T, TError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<TError, Action> onError
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            onError(result.Error!);
+        }
+        return result;
+    }
+
+    public static async Task<Result<TError>> TapErrorAsync<TError>(
+        this Task<Result<TError>> taskResult,
+        Func<TError, Task> onError
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            await onError(result.Error!);
+        }
+        return result;
+    }
+
+    public static async Task<Result<T, TError>> TapErrorAsync<T, TError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<TError, Task> onError
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            await onError(result.Error!);
+        }
+        return result;
+    }
+    #endregion
+
+    #region Ensure & EnsureAsync & EnsureNotNull & EnsureNotNullAsync
+    public static async Task<Result<T, TError>> Ensure<T, TError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, bool> predicate,
+        Func<T, TError> errorFactory
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            return Result<T, TError>.Failure(result.Error!);
+        }
+        return predicate(result.Value!)
+            ? result
+            : Result<T, TError>.Failure(errorFactory(result.Value!));
+    }
+
+    public static async Task<Result<T, TError>> EnsureAsync<T, TError>(
+        this Task<Result<T, TError>> taskResult,
+        Func<T, bool> predicate,
+        Func<T, Task<TError>> errorFactory
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            return Result<T, TError>.Failure(result.Error!);
+        }
+        return predicate(result.Value!)
+            ? result
+            : Result<T, TError>.Failure(await errorFactory(result.Value!));
+    }
+
+    public static async Task<Result<T, TError>> EnsureNotNull<T, TError>(
+        this Task<Result<T?, TError>> taskResult,
+        Func<TError> errorFactory
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            return Result<T, TError>.Failure(result.Error!);
+        }
+        return result.Value is not null
+            ? Result<T, TError>.Success(result.Value)
+            : Result<T, TError>.Failure(errorFactory());
+    }
+
+    public static async Task<Result<T, TError>> EnsureNotNullAsync<T, TError>(
+        this Task<Result<T?, TError>> taskResult,
+        Func<Task<TError>> errorFactory
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        if (result.IsFailure)
+        {
+            return Result<T, TError>.Failure(result.Error!);
+        }
+        return result.Value is not null
+            ? Result<T, TError>.Success(result.Value)
+            : Result<T, TError>.Failure(await errorFactory());
+    }
+    #endregion
+
+    #region ToTaskResultAsync
+    public static async Task<Result<T, TError>> ToTaskResult<T, TError>(
+        this Task<T> taskValue,
+        Func<T, bool> predicate,
+        Func<T, TError> errorFactory
+    )
+        where TError : IError
+    {
+        var value = await taskValue;
+        return predicate(value)
+            ? Result<T, TError>.Success(value)
+            : Result<T, TError>.Failure(errorFactory(value));
+    }
+    #endregion
+}
