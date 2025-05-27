@@ -16,10 +16,10 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
     public IReadOnlyCollection<TaskComment> Comments => _comments.Values;
     public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    private TaskItem(Guid userId, string title, string description, string notes, TaskItemStatus status)
+    private TaskItem(User user, string title, string description, string notes, TaskItemStatus status)
     {
         Id = Guid.CreateVersion7();
-        UserId = userId;
+        UserId = user.Id;
         Title = title;
         Description = description;
         Notes = notes;
@@ -27,7 +27,7 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
     }
 
     public static Result<TaskItem, TaskItemCreateError> TryCreate(
-        Guid userId,
+        User user,
         string title,
         string description,
         string notes,
@@ -35,11 +35,6 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
         TimeProvider timeProvider
     )
     {
-        if (userId == Guid.Empty)
-        {
-            return new InvalidUserIdError();
-        }
-
         if (string.IsNullOrWhiteSpace(title))
         {
             return new EmptyTitleError();
@@ -56,7 +51,7 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
             return new StatusCreateError(statusCreateResult.Error!);
         }
 
-        return new TaskItem(userId, title, description, notes, statusCreateResult.Value!);
+        return new TaskItem(user, title, description, notes, statusCreateResult.Value!);
     }
 
     public Result<AddCommentError> TryAddComment(TaskComment comment)
