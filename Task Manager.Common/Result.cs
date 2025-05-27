@@ -216,20 +216,6 @@ public static class AsyncResultExtensions
         return Result<TResult, TError>.Failure(result.Error!);
     }
 
-    //public static async Task<Result<TResult, TError>> BindAsync<T, TError, TResult>(
-    //    this Task<Result<T, TError>> taskResult,
-    //    Func<T, Task<Result<TResult, TError>>> binder
-    //)
-    //    where TError : IError
-    //{
-    //    var result = await taskResult;
-    //    if (result.IsSuccess)
-    //    {
-    //        return await binder(result.Value);
-    //    }
-    //    return Result<TResult, TError>.Failure(result.Error!);
-    //}
-
     #endregion
 
     #region Map & MapAsync
