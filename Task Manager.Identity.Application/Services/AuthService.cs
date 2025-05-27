@@ -29,18 +29,16 @@ public class AuthService(
 
     public async Task<Result<LoginUserResponse, AuthError>> LoginAsync(LoginUserRequest request, CancellationToken cancellationToken = default)
     {
-        var userFindResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken);
-        if (userFindResult.IsFailure)
+        var userResult = await _userRepository.FindByEmailAsync(request.Email, cancellationToken)
+            .MapError(error => (AuthError)new RepositoryCreateUserError(error))
+            .EnsureNotNull(() => new UserNotFoundError(request.Email));
+
+        if (userResult.IsFailure)
         {
-            return new RepositoryCreateUserError(userFindResult.Error!);
+            return userResult.Error!;
         }
 
-        var user = userFindResult.Value;
-        if (user is null)
-        {
-            return new UserNotFoundError(request.Email);
-        }
-
+        var user = userResult.Value!;
         var passwordValid = await _passwordService.VerifyHashedPassword(user, request.Password);
         if (!passwordValid)
         {
