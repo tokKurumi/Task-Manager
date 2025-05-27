@@ -299,7 +299,6 @@ public static class AsyncResultExtensions
         }
         return Result<TResult, TError>.Failure(result.Error!);
     }
-
     #endregion
 
     #region Map & MapAsync
