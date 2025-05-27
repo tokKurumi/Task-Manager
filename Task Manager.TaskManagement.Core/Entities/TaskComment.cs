@@ -7,7 +7,7 @@ public sealed class TaskComment : IDomainModel
     private readonly List<IDomainEvent> _domainEvents = [];
 
     public Guid Id { get; init; }
-    public User Author { get; init; }
+    public Guid AuthorId { get; init; }
     public string Message { get; init; }
     public DateTimeOffset Timestamp { get; init; }
     public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
@@ -15,7 +15,7 @@ public sealed class TaskComment : IDomainModel
     private TaskComment(User author, string message, DateTimeOffset timestamp)
     {
         Id = Guid.CreateVersion7();
-        Author = author;
+        AuthorId = author.Id;
         Message = message;
         Timestamp = timestamp;
     }
