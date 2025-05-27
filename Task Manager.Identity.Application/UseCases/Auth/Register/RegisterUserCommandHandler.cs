@@ -15,18 +15,17 @@ public sealed class RegisterUserCommandHandler(
     private readonly IAuthService _authService = authService;
     private readonly IDomainEventPublisher _domainEventPublisher = domainEventPublisher;
 
+    // TODO: use case logic and event publishing MUST be under one transaction in unit of work
+    // So, in case when event publishing fails, the whole transaction will be rolled back
+    // See: transactional outbox pattern for event publishing https://microservices.io/patterns/data/transactional-outbox.html
     public async ValueTask<Result<RegisterUserResponse, OneOfError<AuthError, ValidationError>>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var result = await _unitOfWork.ExecuteWithStrategyAsync(async cancellationToken =>
-        {
-            var result = await _authService.RegisterAsync(RegisterUserMapper.ToAuthServiceModel(request), cancellationToken);
-
-            return result
-                .Map(RegisterUserMapper.ToUseCaseModel)
-                .MapError(error => new OneOfError<AuthError, ValidationError>(error));
-        }, cancellationToken);
-
-        return result
-            .Tap(async response => await _domainEventPublisher.PublishManyAsync(response.DomainEvents, cancellationToken));
+        return await _unitOfWork.ExecuteWithStrategyAsync(async cancellationToken =>
+            {
+                return await _authService.RegisterAsync(RegisterUserMapper.ToAuthServiceModel(request), cancellationToken)
+                    .Map(RegisterUserMapper.ToUseCaseModel)
+                    .MapError(error => new OneOfError<AuthError, ValidationError>(error));
+            }, cancellationToken)
+            .TapAsync(response => _domainEventPublisher.PublishManyAsync(response.DomainEvents, cancellationToken));
     }
 }
