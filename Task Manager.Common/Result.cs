@@ -86,7 +86,7 @@ public sealed class Result<TError>
             return this;
         }
 
-        return Result<T, TError>.Failure(errorMapper(other.Error!));
+        return Result<TError>.Failure(errorMapper(other.Error!));
     }
 
     public Result<TError> Tap(Action onSuccess)
