@@ -18,7 +18,7 @@ public class UserEntity : IdentityUser<Guid>, IUserData
         }
     }
 
-    public string DisplayName { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
 
     public DateTimeOffset CreatedAt { get; set; }
 
