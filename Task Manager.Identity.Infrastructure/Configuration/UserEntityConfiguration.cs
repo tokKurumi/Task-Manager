@@ -8,6 +8,10 @@ public class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
     public void Configure(EntityTypeBuilder<UserEntity> builder)
     {
+        builder.Property(user => user.DisplayName)
+            .IsRequired()
+            .HasMaxLength(50);
+
         builder.Property(user => user.CreatedAt)
             .IsRequired();
     }

@@ -18,11 +18,11 @@ public class UserEntity : IdentityUser<Guid>, IUserData
         }
     }
 
-    public string DisplayName { get; set; } = string.Empty;
+    public string DisplayName { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
 
-    public UserEntity() { }
+    protected UserEntity() { } // For EF Core
 
     public UserEntity(ApplicationUser domainUser)
     {
