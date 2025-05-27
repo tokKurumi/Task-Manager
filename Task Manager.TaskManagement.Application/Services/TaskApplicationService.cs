@@ -113,19 +113,25 @@ public partial class TaskApplicationService(
 
     public async Task<Result<TaskApplicationError>> DeleteTaskAsync(DeleteTaskCommand command, CancellationToken cancellationToken = default)
     {
-        return await _taskItemRepository.GetByIdAsync(command.TaskId, cancellationToken)
-        .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error))
-        .EnsureNotNull(() => new TaskNotFoundError(command.TaskId))
-        .Ensure(
-            taskItem => taskItem.UserId == command.UserPerformerId,
-            taskItem => new UserTaskOwnershipDeniedError(taskItem.Id, taskItem.UserId, command.UserPerformerId)
-        )
-        .EnsureAsync(
-            taskItem => _userRepository.ExistsAsync(taskItem.UserId, cancellationToken),
-            taskItem => new UserNotFoundError(taskItem.UserId)
-        )
-        .TapAsync(taskItem => _taskItemRepository.DeleteAsync(taskItem.Id, cancellationToken))
-        .ToUnitResult();
+        var taskResult = await _taskItemRepository.GetByIdAsync(command.TaskId, cancellationToken)
+            .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error))
+            .EnsureNotNull(() => new TaskNotFoundError(command.TaskId))
+            .Ensure(
+                taskItem => taskItem.UserId == command.UserPerformerId,
+                taskItem => new UserTaskOwnershipDeniedError(taskItem.Id, taskItem.UserId, command.UserPerformerId)
+            )
+            .EnsureAsync(
+                taskItem => _userRepository.ExistsAsync(taskItem.UserId, cancellationToken),
+                taskItem => new UserNotFoundError(taskItem.UserId)
+            );
+
+        if (taskResult.IsFailure)
+        {
+            return Result<TaskApplicationError>.Failure(taskResult.Error!);
+        }
+
+        return await _taskItemRepository.DeleteAsync(taskResult.Value!.Id, cancellationToken)
+            .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error));
     }
 
     public async Task<Result<TaskComment, TaskApplicationError>> AddCommentAsync(AddCommentCommand command, CancellationToken cancellationToken = default)
