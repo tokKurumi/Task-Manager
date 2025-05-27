@@ -7,4 +7,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+      <PackageReference Include="Aspire.RabbitMQ.Client.v7" Version="9.3.0" />
+      <PackageReference Include="CommunityToolkit.Aspire.MassTransit.RabbitMQ" Version="9.5.0" />
+      <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Task Manager.TaskManagement.Application\Task Manager.TaskManagement.Application.csproj" />
+  </ItemGroup>
+
 </Project>
