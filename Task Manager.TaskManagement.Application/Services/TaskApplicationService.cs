@@ -14,12 +14,9 @@ public interface ITaskApplicationService
     Task<Result<UserTaskItem?, TaskApplicationError>> GetTaskByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Result<Page<UserTaskItem>, TaskApplicationError>> GetTaskPageAsync(IPagination pagination, CancellationToken cancellationToken = default);
     Task<Result<UserTaskItem, TaskApplicationError>> UpdateTaskAsync(UpdateTaskCommand command, CancellationToken cancellationToken = default);
-    Task<Result<TaskApplicationError>> DeleteTaskAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<Result<TaskComment, TaskCommentApplicationError>> AddCommentAsync(Guid taskId, TaskComment comment, CancellationToken cancellationToken = default);
-    Task<Result<TaskComment, TaskCommentApplicationError>> GetCommentByIdAsync(Guid taskId, Guid commentId, CancellationToken cancellationToken = default);
-    Task<Result<Page<TaskComment>, TaskCommentApplicationError>> GetCommentsPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default);
-    Task<Result<TaskComment, TaskCommentApplicationError>> UpdateCommentsync(TaskComment comment, CancellationToken cancellationToken = default);
-    Task<Result<TaskCommentApplicationError>> DeleteCommentAsync(Guid taskId, Guid commentId, CancellationToken cancellationToken = default);
+    Task<Result<TaskApplicationError>> DeleteTaskAsync(DeleteTaskCommand command, CancellationToken cancellationToken = default);
+    Task<Result<TaskComment, TaskApplicationError>> AddCommentAsync(AddCommentCommand command, CancellationToken cancellationToken = default);
+    Task<Result<Page<TaskComment>, TaskApplicationError>> GetCommentsPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default);
 }
 
 public partial class TaskApplicationService(
@@ -37,8 +34,7 @@ public partial class TaskApplicationService(
         return await _userRepository.GetByIdAsync(command.UserPerformerId, cancellationToken)
             .MapError(error => (TaskApplicationError)new UserRepositoryInnerError(error))
             .EnsureNotNull(() => new UserNotFoundError(command.UserPerformerId))
-            .Bind(user => TaskItem.TryCreate
-                (
+            .Bind(user => TaskItem.TryCreate(
                     user.Id,
                     command.Title,
                     command.Description,
@@ -57,7 +53,7 @@ public partial class TaskApplicationService(
         return await _taskItemRepository.GetByIdAsync(id, cancellationToken)
             .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error))
             .BindAsync(taskItem => taskItem is null
-                ? Task.FromResult(Result<UserTaskItem?, TaskApplicationError>.Success(null))
+                ? Result<UserTaskItem?, TaskApplicationError>.Success(null).ToTask()
                 : _userRepository.GetByIdAsync(taskItem.UserId, cancellationToken)
                     .MapError(error => (TaskApplicationError)new UserRepositoryInnerError(error))
                     .EnsureNotNull(() => new UserNotFoundError(taskItem.UserId))
@@ -67,31 +63,33 @@ public partial class TaskApplicationService(
 
     public async Task<Result<Page<UserTaskItem>, TaskApplicationError>> GetTaskPageAsync(IPagination pagination, CancellationToken cancellationToken = default)
     {
-        var taskItemResults = await _taskItemRepository.GetPageAsync(pagination, cancellationToken);
-        if (taskItemResults.IsFailure)
+        async Task<Result<Page<UserTaskItem>, TaskApplicationError>> FetchUsersAndMapItems(
+            Page<TaskItem> taskPage,
+            CancellationToken cancelationToken
+        )
         {
-            return new TaskRepositoryInnerError(taskItemResults.Error!);
+            var userIds = taskPage.Items.Select(task => task.UserId).Distinct().ToList();
+            return await _userRepository
+                .GetUsersByIds(userIds, cancelationToken)
+                .MapError(error => (TaskApplicationError)new UsersNotFoundError(error.UserIds))
+                .Map(users =>
+                {
+                    var userMap = users.ToDictionary(user => user.Id, user => user);
+                    var userTaskItems = taskPage.Items.Select(taskItem => new UserTaskItem(
+                        userMap[taskItem.UserId],
+                        taskItem
+                    )).ToList();
+                    return new Page<UserTaskItem>(userTaskItems, taskPage.PageNumber, taskPage.PageSize, taskPage.Count);
+                });
         }
 
-        if (taskItemResults.Value!.Count == 0)
-        {
-            return Result<Page<UserTaskItem>, TaskApplicationError>.Success(new Page<UserTaskItem>([], pagination, 0));
-        }
-
-        var userIds = taskItemResults.Value.Items.Select(task => task.UserId).Distinct().ToList();
-        var userResults = await _userRepository.GetUsersByIds(userIds, cancellationToken);
-        if (userResults.IsFailure)
-        {
-            return new UsersNotFoundError(userResults.Error!.UserIds);
-        }
-
-        var userMap = userResults.Value!.ToDictionary(user => user.Id, user => user);
-        var userTaskItems = taskItemResults.Value.Items.Select(taskItem => new UserTaskItem(
-            userMap[taskItem.UserId],
-            taskItem
-        )).ToList();
-
-        return new Page<UserTaskItem>(userTaskItems, pagination, taskItemResults.Value.Count);
+        return await _taskItemRepository
+            .GetPageAsync(pagination, cancellationToken)
+            .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error))
+            .BindAsync(taskPage => taskPage.Count == 0
+                ? Result<Page<UserTaskItem>, TaskApplicationError>.Success(new Page<UserTaskItem>([], pagination, 0)).ToTask()
+                : FetchUsersAndMapItems(taskPage, cancellationToken)
+            );
     }
 
     public async Task<Result<UserTaskItem, TaskApplicationError>> UpdateTaskAsync(UpdateTaskCommand command, CancellationToken cancellationToken = default)
@@ -104,53 +102,55 @@ public partial class TaskApplicationService(
                 taskItem => new UserTaskOwnershipDeniedError(taskItem.Id, taskItem.UserId, command.UserPerformerId)
             )
             .BindAsync(taskItem => _userRepository.GetByIdAsync(command.UserPerformerId, cancellationToken)
+                .MapError(error => (TaskApplicationError)new UserRepositoryInnerError(error))
+                .EnsureNotNull(() => new UserNotFoundError(taskItem.UserId))
+                .Map(user => new UserTaskItem(user, taskItem))
+            );
+    }
+
+    public async Task<Result<TaskApplicationError>> DeleteTaskAsync(DeleteTaskCommand command, CancellationToken cancellationToken = default)
+    {
+        return await _taskItemRepository.GetByIdAsync(command.TaskId, cancellationToken)
+            .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error))
+            .EnsureNotNull(() => new TaskNotFoundError(command.TaskId))
+            .Ensure(
+                    taskItem => taskItem.UserId == command.UserPerformerId,
+                    taskItem => new UserTaskOwnershipDeniedError(taskItem.Id, taskItem.UserId, command.UserPerformerId)
+            )
+            .EnsureAsync(
+                taskItem => _userRepository.ExistsAsync(taskItem.UserId, cancellationToken),
+                taskItem => new UserNotFoundError(taskItem.UserId)
+            )
+            .TapAsync(taskItem => _taskItemRepository.DeleteAsync(taskItem.Id, cancellationToken))
+            .ToUnitResult();
+    }
+
+    public async Task<Result<TaskComment, TaskApplicationError>> AddCommentAsync(AddCommentCommand command, CancellationToken cancellationToken = default)
+    {
+        return await _userRepository.GetByIdAsync(command.UserPerformerId, cancellationToken)
             .MapError(error => (TaskApplicationError)new UserRepositoryInnerError(error))
-            .EnsureNotNull(() => new UserNotFoundError(taskItem.UserId))
-            .Map(user => new UserTaskItem(user, taskItem)));
+            .EnsureNotNull(() => new UserNotFoundError(command.UserPerformerId))
+            .BindAsync(user => _taskItemRepository.GetByIdAsync(command.TaskId, cancellationToken)
+                .MapError(error => (TaskApplicationError)new TaskRepositoryInnerError(error))
+                .EnsureNotNull(() => new TaskNotFoundError(command.TaskId))
+                .BindAsync(task => TaskComment.TryCreate(user, command.Message, _timeProvider)
+                    .MapError(error => (TaskApplicationError)new TaskCommentCreationError(error))
+                    .EnsureBy(comment => task.TryAddComment(comment), error => new TaskCommentAddError(error))
+                    .ToTask()
+                )
+            );
     }
 
-    public async Task<Result<TaskApplicationError>> DeleteTaskAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Result<Page<TaskComment>, TaskApplicationError>> GetCommentsPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default)
     {
-        var result = await _taskItemRepository.DeleteAsync(id, cancellationToken);
-        return result.MapError<TaskApplicationError>(error => new TaskRepositoryInnerError(error));
-    }
-
-    public async Task<Result<TaskComment, TaskCommentApplicationError>> AddCommentAsync(Guid taskId, TaskComment comment, CancellationToken cancellationToken = default)
-    {
-        var result = await _taskItemRepository.AddCommentAsync(taskId, comment, cancellationToken);
-        return result.MapError<TaskCommentApplicationError>(error => new TaskCommentRepositoryInnerError(error));
-    }
-
-    public async Task<Result<TaskComment, TaskCommentApplicationError>> GetCommentByIdAsync(Guid taskId, Guid commentId, CancellationToken cancellationToken = default)
-    {
-        var result = await _taskItemRepository.GetCommentByIdAsync(taskId, commentId, cancellationToken);
-        return result.MapError<TaskCommentApplicationError>(error => new TaskCommentRepositoryInnerError(error));
-    }
-
-    public async Task<Result<Page<TaskComment>, TaskCommentApplicationError>> GetCommentsPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default)
-    {
-        var result = await _taskItemRepository.GetCommentsPageAsync(taskId, pagination, cancellationToken);
-        return result.MapError<TaskCommentApplicationError>(error => new TaskCommentRepositoryInnerError(error));
-    }
-
-    public async Task<Result<TaskComment, TaskCommentApplicationError>> UpdateCommentsync(TaskComment comment, CancellationToken cancellationToken = default)
-    {
-        var result = await _taskItemRepository.UpdateCommentAsync(comment, cancellationToken);
-        return result.MapError<TaskCommentApplicationError>(error => new TaskCommentRepositoryInnerError(error));
-    }
-
-    public async Task<Result<TaskCommentApplicationError>> DeleteCommentAsync(Guid taskId, Guid commentId, CancellationToken cancellationToken = default)
-    {
-        var result = await _taskItemRepository.DeleteCommentAsync(taskId, commentId, cancellationToken);
-        return result.MapError<TaskCommentApplicationError>(error => new TaskCommentRepositoryInnerError(error));
+        return await _taskItemRepository.GetCommentPageAsync(taskId, pagination, cancellationToken)
+            .MapError(error => (TaskApplicationError)new TaskCommentRepositoryInnerError(error));
     }
 }
 
 public sealed record UserNotFoundError(Guid UserId) : TaskApplicationError;
 
 public sealed record UsersNotFoundError(IEnumerable<Guid> UserIds) : TaskApplicationError;
-
-public sealed record TaskOwnerNotFoundError(Guid TaskId) : TaskApplicationError;
 
 public sealed record UserTaskOwnershipDeniedError(Guid TaskId, Guid TaskUserOwnerId, Guid UserPerformerId) : TaskApplicationError;
 
@@ -160,6 +160,10 @@ public sealed record TaskItemCreationError(TaskItemCreateError InnerError) : Tas
 
 public sealed record TaskRepositoryInnerError(TaskItemRepositoryError InnerError) : TaskApplicationError;
 
-public sealed record TaskCommentRepositoryInnerError(TaskItemCommentRepositoryError InnerError) : TaskCommentApplicationError;
+public sealed record TaskCommentRepositoryInnerError(TaskItemCommentRepositoryError InnerError) : TaskApplicationError;
 
 public sealed record UserRepositoryInnerError(UserRepositoryError InnerError) : TaskApplicationError;
+
+public sealed record TaskCommentCreationError(TaskCommentCreateError InnerError) : TaskApplicationError;
+
+public sealed record TaskCommentAddError(AddCommentError InnerError) : TaskApplicationError;
