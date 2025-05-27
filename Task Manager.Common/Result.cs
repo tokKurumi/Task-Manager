@@ -58,6 +58,37 @@ public sealed class Result<TError>
             ? onSuccess()
             : onFailure(Error!);
 
+    public Result<TError> Ensure(Func<bool> predicate, Func<TError> errorFactory)
+    {
+        if (IsFailure)
+        {
+            return Result<TError>.Failure(Error!);
+        }
+
+        if (predicate())
+        {
+            return this;
+        }
+
+        return Result<TError>.Failure(errorFactory());
+    }
+
+    public Result<TError> EnsureBy<TOtherError>(Result<TOtherError> other, Func<TOtherError, TError> errorMapper)
+        where TOtherError : IError
+    {
+        if (IsFailure)
+        {
+            return Result<TError>.Failure(Error!);
+        }
+
+        if (other.IsSuccess)
+        {
+            return this;
+        }
+
+        return Result<T, TError>.Failure(errorMapper(other.Error!));
+    }
+
     public Result<TError> Tap(Action onSuccess)
     {
         if (IsSuccess)
@@ -77,6 +108,8 @@ public sealed class Result<TError>
 
         return this;
     }
+
+    public Task<Result<TError>> ToTask() => Task.FromResult(this);
 }
 
 
@@ -132,9 +165,58 @@ public sealed class Result<T, TError>
             : Result<TResult, TError>.Failure(Error!);
 
     public TResult Match<TResult>(Func<T, TResult> onSuccess, Func<TError, TResult> onFailure)
-        => IsSuccess
-            ? onSuccess(Value!)
-            : onFailure(Error!);
+            => IsSuccess
+                ? onSuccess(Value!)
+                : onFailure(Error!);
+
+    public Result<T, TError> Ensure(Func<T, bool> predicate, Func<T, TError> errorFactory)
+    {
+        if (IsFailure)
+        {
+            return Result<T, TError>.Failure(Error!);
+        }
+
+        if (predicate(Value!))
+        {
+            return this;
+        }
+
+        return Result<T, TError>.Failure(errorFactory(Value!));
+    }
+
+    public Result<T, TError> EnsureBy<TOther, TOtherError>(Func<T, Result<TOther, TOtherError>> other, Func<TOtherError, TError> errorMapper)
+        where TOtherError : IError
+    {
+        if (IsFailure)
+        {
+            return Result<T, TError>.Failure(Error!);
+        }
+
+        var otherResult = other(Value!);
+        if (otherResult.IsSuccess)
+        {
+            return this;
+        }
+
+        return Result<T, TError>.Failure(errorMapper(otherResult.Error!));
+    }
+
+    public Result<T, TError> EnsureBy<TOtherError>(Func<T, Result<TOtherError>> other, Func<TOtherError, TError> errorMapper)
+        where TOtherError : IError
+    {
+        if (IsFailure)
+        {
+            return Result<T, TError>.Failure(Error!);
+        }
+
+        var otherResult = other(Value!);
+        if (otherResult.IsSuccess)
+        {
+            return this;
+        }
+
+        return Result<T, TError>.Failure(errorMapper(otherResult.Error!));
+    }
 
     public Result<T, TError> Tap(Action<T> onSuccess)
     {
@@ -155,6 +237,8 @@ public sealed class Result<T, TError>
 
         return this;
     }
+
+    public Task<Result<T, TError>> ToTask() => Task.FromResult(this);
 }
 
 public static class AsyncResultExtensions
@@ -414,7 +498,7 @@ public static class AsyncResultExtensions
     }
     #endregion
 
-    #region Ensure & EnsureAsync & EnsureNotNull & EnsureNotNullAsync
+    #region Ensure & EnsureAsync & EnsureNotNull
     public static async Task<Result<T, TError>> Ensure<T, TError>(
         this Task<Result<T, TError>> taskResult,
         Func<T, bool> predicate,
@@ -434,8 +518,8 @@ public static class AsyncResultExtensions
 
     public static async Task<Result<T, TError>> EnsureAsync<T, TError>(
         this Task<Result<T, TError>> taskResult,
-        Func<T, bool> predicate,
-        Func<T, Task<TError>> errorFactory
+        Func<T, Task<bool>> predicateTask,
+        Func<T, TError> errorFactory
     )
         where TError : IError
     {
@@ -444,9 +528,9 @@ public static class AsyncResultExtensions
         {
             return Result<T, TError>.Failure(result.Error!);
         }
-        return predicate(result.Value!)
+        return await predicateTask(result.Value!)
             ? result
-            : Result<T, TError>.Failure(await errorFactory(result.Value!));
+            : Result<T, TError>.Failure(errorFactory(result.Value!));
     }
 
     public static async Task<Result<T, TError>> EnsureNotNull<T, TError>(
@@ -464,25 +548,9 @@ public static class AsyncResultExtensions
             ? Result<T, TError>.Success(result.Value)
             : Result<T, TError>.Failure(errorFactory());
     }
-
-    public static async Task<Result<T, TError>> EnsureNotNullAsync<T, TError>(
-        this Task<Result<T?, TError>> taskResult,
-        Func<Task<TError>> errorFactory
-    )
-        where TError : IError
-    {
-        var result = await taskResult;
-        if (result.IsFailure)
-        {
-            return Result<T, TError>.Failure(result.Error!);
-        }
-        return result.Value is not null
-            ? Result<T, TError>.Success(result.Value)
-            : Result<T, TError>.Failure(await errorFactory());
-    }
     #endregion
 
-    #region ToTaskResultAsync
+    #region ToTaskResultAsync & ToUnitResult
     public static async Task<Result<T, TError>> ToTaskResult<T, TError>(
         this Task<T> taskValue,
         Func<T, bool> predicate,
@@ -494,6 +562,17 @@ public static class AsyncResultExtensions
         return predicate(value)
             ? Result<T, TError>.Success(value)
             : Result<T, TError>.Failure(errorFactory(value));
+    }
+
+    public static async Task<Result<TError>> ToUnitResult<T, TError>(
+        this Task<Result<T, TError>> taskResult
+    )
+        where TError : IError
+    {
+        var result = await taskResult;
+        return result.IsSuccess
+            ? Result<TError>.Success()
+            : Result<TError>.Failure(result.Error!);
     }
     #endregion
 }
