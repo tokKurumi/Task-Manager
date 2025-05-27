@@ -9,6 +9,14 @@ public enum TaskStatus
     Completed,
 }
 
+public interface ITaskItemStatusData
+{
+    TaskStatus Status { get; }
+    DateTimeOffset CreatedAt { get; }
+    DateTimeOffset? ApproximateCompletedAt { get; }
+    DateTimeOffset? CompletedAt { get; }
+}
+
 public sealed class TaskItemStatus : IDomainModel
 {
     private readonly List<IDomainEvent> _domainEvents = [];
@@ -26,6 +34,19 @@ public sealed class TaskItemStatus : IDomainModel
         ApproximateCompletedAt = approximateCompletedAt;
     }
 
+    private TaskItemStatus(
+        TaskStatus status,
+        DateTimeOffset createdAt,
+        DateTimeOffset? approximateCompletedAt,
+        DateTimeOffset? completedAt
+    )
+    {
+        Status = status;
+        CreatedAt = createdAt;
+        ApproximateCompletedAt = approximateCompletedAt;
+        CompletedAt = completedAt;
+    }
+
     public static Result<TaskItemStatus, TaskItemStatusCreateError> TryCreate(DateTimeOffset? approximateCompletedAt, TimeProvider timeProvider)
     {
         var now = timeProvider.GetUtcNow();
@@ -35,6 +56,11 @@ public sealed class TaskItemStatus : IDomainModel
         }
 
         return new TaskItemStatus(now, approximateCompletedAt);
+    }
+
+    public static Result<TaskItemStatus, TaskItemStatusCreateError> TryConvertFromData(ITaskItemStatusData data)
+    {
+        return new TaskItemStatus(data.Status, data.CreatedAt, data.ApproximateCompletedAt, data.CompletedAt);
     }
 
     public Result<MoveToInProgeressError> TryMoveToInProgress()

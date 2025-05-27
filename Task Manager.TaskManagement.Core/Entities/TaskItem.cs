@@ -2,6 +2,16 @@
 
 namespace Task_Manager.TaskManagement.Core.Entities;
 
+public interface ITaskItemData
+{
+    public Guid Id { get; }
+    public Guid UserId { get; }
+    public string Title { get; }
+    public string Description { get; }
+    public string Notes { get; }
+    public ITaskItemStatusData Status { get; }
+}
+
 public sealed class TaskItem : IDomainModel, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = [];
@@ -20,6 +30,16 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
     {
         Id = Guid.CreateVersion7();
         UserId = user.Id;
+        Title = title;
+        Description = description;
+        Notes = notes;
+        Status = status;
+    }
+
+    private TaskItem(Guid id, Guid userId, string title, string description, string notes, TaskItemStatus status)
+    {
+        Id = id;
+        UserId = userId;
         Title = title;
         Description = description;
         Notes = notes;
@@ -52,6 +72,34 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
         }
 
         return new TaskItem(user, title, description, notes, statusCreateResult.Value!);
+    }
+
+    public static Result<TaskItem, TaskItemCreateError> TryConvertFromData(ITaskItemData taskItemData)
+    {
+        if (string.IsNullOrWhiteSpace(taskItemData.Title))
+        {
+            return new EmptyTitleError();
+        }
+
+        if (string.IsNullOrWhiteSpace(taskItemData.Description))
+        {
+            return new EmptyDescriptionError();
+        }
+
+        var statusCreateResult = TaskItemStatus.TryConvertFromData(taskItemData.Status);
+        if (statusCreateResult.IsFailure)
+        {
+            return new StatusCreateError(statusCreateResult.Error!);
+        }
+
+        return new TaskItem(
+            taskItemData.Id,
+            taskItemData.UserId,
+            taskItemData.Title,
+            taskItemData.Description,
+            taskItemData.Notes,
+            statusCreateResult.Value!
+        );
     }
 
     public Result<AddCommentError> TryAddComment(TaskComment comment)

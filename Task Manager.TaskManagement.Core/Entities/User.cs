@@ -1,6 +1,10 @@
-﻿using Task_Manager.Common;
+﻿namespace Task_Manager.TaskManagement.Core.Entities;
 
-namespace Task_Manager.TaskManagement.Core.Entities;
+public interface IUserData
+{
+    Guid Id { get; }
+    string DisplayName { get; }
+}
 
 // projection of user from Identity micro-service
 public sealed class User : IDomainModel, IAggregateRoot
@@ -19,14 +23,13 @@ public sealed class User : IDomainModel, IAggregateRoot
         DisplayName = displayName;
     }
 
-    public static Result<User, UserCreateError> TryCreate(Guid id, string displayName)
+    public static User Create(Guid id, string displayName)
     {
         return new User(id, displayName);
     }
+
+    public static User ConvertFromData(IUserData userData)
+    {
+        return new User(userData.Id, userData.DisplayName);
+    }
 }
-
-public abstract record UserCreateError : IError;
-
-public abstract record UserAddTaskError : IError;
-
-public sealed record DuplicateTaskError(TaskItem Task) : UserAddTaskError;
