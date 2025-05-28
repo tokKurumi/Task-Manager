@@ -3,7 +3,7 @@ using TaskStatus = Task_Manager.TaskManagement.Core.Entities.TaskStatus;
 
 namespace Task_Manager.TaskManagement.Infrastructure.Entities;
 
-public class TaskItemEntity : ITaskItemData
+public class TaskItemEntity : ITaskItemData, IInfrastructureEntity<TaskItem, TaskItemEntity>
 {
     public Guid Id { get; set; }
     public UserEntity? User { get; set; }
@@ -35,6 +35,8 @@ public class TaskItemEntity : ITaskItemData
         ApproximateCompletedAt = domainTaskItem.Status.ApproximateCompletedAt;
         CompletedAt = domainTaskItem.Status.CompletedAt;
     }
+
+    public static TaskItemEntity Create(TaskItem input) => new(input);
 
     private sealed class TaskItemStatusAdapter(TaskItemEntity entity) : ITaskItemStatusData
     {

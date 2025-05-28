@@ -2,7 +2,7 @@
 
 namespace Task_Manager.TaskManagement.Infrastructure.Entities;
 
-public class UserEntity : IUserData
+public class UserEntity : IUserData, IInfrastructureEntity<User, UserEntity>
 {
     public Guid Id { get; set; }
     public string DisplayName { get; set; } = string.Empty;
@@ -17,4 +17,6 @@ public class UserEntity : IUserData
         Id = domainUser.Id;
         DisplayName = domainUser.DisplayName;
     }
+
+    public static UserEntity Create(User input) => new(input);
 }

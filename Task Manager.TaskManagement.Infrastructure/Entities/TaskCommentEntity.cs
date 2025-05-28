@@ -2,7 +2,7 @@
 
 namespace Task_Manager.TaskManagement.Infrastructure.Entities;
 
-public class TaskCommentEntity : ITaskCommentData
+public class TaskCommentEntity : ITaskCommentData, IInfrastructureEntity<TaskComment, TaskCommentEntity>
 {
     public Guid Id { get; set; }
     public UserEntity? Author { get; set; }
@@ -21,4 +21,6 @@ public class TaskCommentEntity : ITaskCommentData
         Message = domainTaskComment.Message;
         Timestamp = domainTaskComment.Timestamp;
     }
+
+    public static TaskCommentEntity Create(TaskComment input) => new(input);
 }
