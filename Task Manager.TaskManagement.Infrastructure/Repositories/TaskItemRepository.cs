@@ -14,7 +14,26 @@ public class TaskItemRepository(
 {
     private readonly TaskManagementDbContext _context = context;
 
-    public async Task<Result<TaskComment, TaskItemCommentRepositoryError>> AddCommentAsync(Guid taskId, TaskComment comment, CancellationToken cancellationToken = default)
+    public async Task<Result<TaskItem, TaskItemRepositoryError>> UpdateAsync(TaskItem task, CancellationToken cancellationToken = default)
+    {
+        var taskEntity = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == task.Id, cancellationToken);
+        if (taskEntity is null)
+        {
+            return new TaskNotFoundError(task.Id);
+        }
+
+        taskEntity.UserId = task.UserId;
+        taskEntity.Title = task.Title;
+        taskEntity.Description = task.Description;
+        taskEntity.Notes = task.Notes;
+        taskEntity.Status = task.Status.Status;
+        taskEntity.ApproximateCompletedAt = task.Status.ApproximateCompletedAt;
+        taskEntity.CompletedAt = task.Status.CompletedAt;
+
+        return TaskItem.ConvertFromData(taskEntity);
+    }
+
+    public async Task<Result<TaskComment, TaskItemRepositoryError>> AddCommentAsync(Guid taskId, TaskComment comment, CancellationToken cancellationToken = default)
     {
         var taskEntity = await _context.Tasks.FirstOrDefaultAsync(task => task.Id == taskId, cancellationToken);
         if (taskEntity is null)
@@ -28,7 +47,7 @@ public class TaskItemRepository(
         return TaskComment.ConvertFromData(commentEntity);
     }
 
-    public async Task<Result<Page<TaskComment>, TaskItemCommentRepositoryError>> GetCommentPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default)
+    public async Task<Result<Page<TaskComment>, TaskItemRepositoryError>> GetCommentPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default)
     {
         var totalTaskComments = await _context.Comments.AsNoTracking()
             .Where(comment => comment.TaskId == taskId)
