@@ -22,7 +22,7 @@ public class UserEntity : IdentityUser<Guid>, IUserData
 
     public DateTimeOffset CreatedAt { get; set; }
 
-    protected UserEntity() { } // For EF Core
+    public UserEntity() { } // For EF Core
 
     public UserEntity(ApplicationUser domainUser)
     {
