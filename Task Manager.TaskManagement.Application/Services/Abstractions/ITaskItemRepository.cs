@@ -9,6 +9,6 @@ public interface ITaskItemRepository : IGenericRepository<TaskItem, TaskItemRepo
     Task<Result<Page<TaskComment>, TaskItemCommentRepositoryError>> GetCommentPageAsync(Guid taskId, IPagination pagination, CancellationToken cancellationToken = default);
 }
 
-public abstract record TaskItemRepositoryError : IError;
+public abstract record TaskItemRepositoryError : RepositoryError;
 
 public abstract record TaskItemCommentRepositoryError : TaskItemRepositoryError;

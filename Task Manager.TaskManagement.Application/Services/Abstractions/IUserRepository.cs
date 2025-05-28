@@ -8,6 +8,6 @@ public interface IUserRepository : IGenericRepository<User, UserRepositoryError>
     Task<Result<IReadOnlyList<User>, UsersNotFoundError>> GetUsersByIds(IEnumerable<Guid> userIds, CancellationToken cancellationToken = default);
 }
 
-public abstract record UserRepositoryError : IError;
+public abstract record UserRepositoryError : RepositoryError;
 
 public sealed record UsersNotFoundError(IReadOnlyList<Guid> UserIds) : UserRepositoryError;
