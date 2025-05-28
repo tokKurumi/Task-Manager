@@ -12,7 +12,7 @@ public class GenericRepository<TDomainEntity, TInfraEntity, TError>(
     Func<Guid, TError> notFoundErrorFactory
 ) : IGenericRepository<TDomainEntity, TError>
     where TDomainEntity : class, IAggregateRoot, IDomainModel, IDomainModel<TInfraEntity, TDomainEntity>
-    where TInfraEntity : class, IInfrastructureEntity<TDomainEntity, TInfraEntity>, IDomainModel
+    where TInfraEntity : class, IInfrastructureEntity<TDomainEntity, TInfraEntity>
     where TError : RepositoryError
 {
     private readonly DbSet<TInfraEntity> _dbSet = context.Set<TInfraEntity>();
