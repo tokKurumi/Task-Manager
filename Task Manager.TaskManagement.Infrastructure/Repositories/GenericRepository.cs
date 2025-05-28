@@ -39,12 +39,12 @@ public class GenericRepository<TDomainEntity, TInfraEntity, TError>(
 
     public Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return _dbSet.AnyAsync(entity => entity.Id == id, cancellationToken);
+        return _dbSet.AsNoTracking().AnyAsync(entity => entity.Id == id, cancellationToken);
     }
 
     public async Task<Result<TDomainEntity?, TError>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var infraEntity = await _dbSet.FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
+        var infraEntity = await _dbSet.AsNoTracking().FirstOrDefaultAsync(entity => entity.Id == id, cancellationToken);
         if (infraEntity is null)
         {
             return Result<TDomainEntity?, TError>.Success(null);
@@ -55,7 +55,7 @@ public class GenericRepository<TDomainEntity, TInfraEntity, TError>(
 
     public async Task<Result<Page<TDomainEntity>, TError>> GetPageAsync(IPagination pagination, CancellationToken cancellationToken = default)
     {
-        var query = _dbSet.AsQueryable();
+        var query = _dbSet.AsNoTracking().AsQueryable();
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
             .Skip((pagination.Page - 1) * pagination.PageSize)
