@@ -9,6 +9,8 @@ public class TaskManagementDbContext(
 ) : DbContext(options)
 {
     public DbSet<UserEntity> Users { get; set; }
+    public DbSet<TaskItemEntity> Tasks { get; set; }
+    public DbSet<TaskCommentEntity> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
