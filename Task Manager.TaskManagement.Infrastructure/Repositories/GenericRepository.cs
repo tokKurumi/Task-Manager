@@ -7,20 +7,20 @@ using Task_Manager.TaskManagement.Infrastructure.Entities;
 
 namespace Task_Manager.TaskManagement.Infrastructure.Repositories;
 
-public class GenericRepository<TDomainEntity, TInfraEntity, TError>(
+public class GenericRepository<TDomainEntity, TInfrastructureEntity, TError>(
     TaskManagementDbContext context,
     Func<Guid, TError> notFoundErrorFactory
 ) : IGenericRepository<TDomainEntity, TError>
-    where TDomainEntity : class, IAggregateRoot, IDomainModel, IDomainModel<TInfraEntity, TDomainEntity>
-    where TInfraEntity : class, IInfrastructureEntity<TDomainEntity, TInfraEntity>
+    where TDomainEntity : class, IAggregateRoot, IDomainModel, IDomainModel<TInfrastructureEntity, TDomainEntity>
+    where TInfrastructureEntity : class, IInfrastructureEntity<TDomainEntity, TInfrastructureEntity>
     where TError : RepositoryError
 {
-    private readonly DbSet<TInfraEntity> _dbSet = context.Set<TInfraEntity>();
+    private readonly DbSet<TInfrastructureEntity> _dbSet = context.Set<TInfrastructureEntity>();
     private readonly Func<Guid, TError> _notFoundErrorFactory = notFoundErrorFactory;
 
     public async Task<Result<TDomainEntity, TError>> CreateAsync(TDomainEntity entity, CancellationToken cancellationToken = default)
     {
-        var infraEntity = TInfraEntity.Create(entity);
+        var infraEntity = TInfrastructureEntity.Create(entity);
         await _dbSet.AddAsync(infraEntity, cancellationToken);
         return Result<TDomainEntity, TError>.Success(entity);
     }
