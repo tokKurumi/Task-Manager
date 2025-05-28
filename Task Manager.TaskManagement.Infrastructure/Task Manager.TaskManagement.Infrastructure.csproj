@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Task Manager.Integrations\Task Manager.Integrations.csproj" />
     <ProjectReference Include="..\Task Manager.TaskManagement.Application\Task Manager.TaskManagement.Application.csproj" />
   </ItemGroup>
 

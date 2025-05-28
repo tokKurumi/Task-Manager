@@ -37,7 +37,7 @@ var identity = builder
 #endregion
 
 builder
-    .AddProject<Projects.Task_Manager_TaskManagement_TaskAPI>(TaskProject.API)
+    .AddProject<Projects.Task_Manager_TaskManagement_TaskAPI>(TaskManagmentProject.API)
     .WithJwtParameters(jwtParameters);
 
 await builder.Build().RunAsync();
