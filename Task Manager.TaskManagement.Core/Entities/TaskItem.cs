@@ -12,7 +12,7 @@ public interface ITaskItemData
     public ITaskItemStatusData Status { get; }
 }
 
-public sealed class TaskItem : IDomainModel, IAggregateRoot
+public sealed class TaskItem : IDomainModel<ITaskItemData, TaskItem>, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = [];
     private readonly Dictionary<Guid, TaskComment> _comments = [];
@@ -74,31 +74,15 @@ public sealed class TaskItem : IDomainModel, IAggregateRoot
         return new TaskItem(user, title, description, notes, statusCreateResult.Value!);
     }
 
-    public static Result<TaskItem, TaskItemCreateError> TryConvertFromData(ITaskItemData taskItemData)
+    public static TaskItem ConvertFromData(ITaskItemData taskItemData)
     {
-        if (string.IsNullOrWhiteSpace(taskItemData.Title))
-        {
-            return new EmptyTitleError();
-        }
-
-        if (string.IsNullOrWhiteSpace(taskItemData.Description))
-        {
-            return new EmptyDescriptionError();
-        }
-
-        var statusCreateResult = TaskItemStatus.TryConvertFromData(taskItemData.Status);
-        if (statusCreateResult.IsFailure)
-        {
-            return new StatusCreateError(statusCreateResult.Error!);
-        }
-
         return new TaskItem(
             taskItemData.Id,
             taskItemData.UserId,
             taskItemData.Title,
             taskItemData.Description,
             taskItemData.Notes,
-            statusCreateResult.Value!
+            TaskItemStatus.ConvertFromData(taskItemData.Status)
         );
     }
 

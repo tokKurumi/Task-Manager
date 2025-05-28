@@ -7,7 +7,7 @@ public interface IUserData
 }
 
 // projection of user from Identity micro-service
-public sealed class User : IDomainModel, IAggregateRoot
+public sealed class User : IDomainModel<IUserData, User>, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 

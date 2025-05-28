@@ -17,7 +17,7 @@ public interface ITaskItemStatusData
     DateTimeOffset? CompletedAt { get; }
 }
 
-public sealed class TaskItemStatus : IDomainModel
+public sealed class TaskItemStatus : IDomainModel<ITaskItemStatusData, TaskItemStatus>
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
@@ -58,7 +58,7 @@ public sealed class TaskItemStatus : IDomainModel
         return new TaskItemStatus(now, approximateCompletedAt);
     }
 
-    public static Result<TaskItemStatus, TaskItemStatusCreateError> TryConvertFromData(ITaskItemStatusData data)
+    public static TaskItemStatus ConvertFromData(ITaskItemStatusData data)
     {
         return new TaskItemStatus(data.Status, data.CreatedAt, data.ApproximateCompletedAt, data.CompletedAt);
     }

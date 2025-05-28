@@ -10,7 +10,7 @@ public interface ITaskCommentData
     DateTimeOffset Timestamp { get; }
 }
 
-public sealed class TaskComment : IDomainModel
+public sealed class TaskComment : IDomainModel<ITaskCommentData, TaskComment>
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
@@ -45,13 +45,8 @@ public sealed class TaskComment : IDomainModel
         return new TaskComment(author, message, timeProvider.GetUtcNow());
     }
 
-    public static Result<TaskComment, TaskCommentCreateError> TryConvertFromData(ITaskCommentData taskCommentData)
+    public static TaskComment ConvertFromData(ITaskCommentData taskCommentData)
     {
-        if (string.IsNullOrWhiteSpace(taskCommentData.Message))
-        {
-            return new EmptyMessageError();
-        }
-
         return new TaskComment(taskCommentData.AuthorId, taskCommentData.Message, taskCommentData.Timestamp);
     }
 }
