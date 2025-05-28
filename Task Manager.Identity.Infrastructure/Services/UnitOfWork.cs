@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Task_Manager.Common;
 using Task_Manager.Identity.Application.Services.Abstractions;
 using Task_Manager.Identity.Infrastructure.Data;
 
@@ -12,7 +13,34 @@ public class UnitOfWork(
     private readonly ApplicationIdentityDbContext _dbContext = dbContext;
     private IDbContextTransaction? _transaction;
 
-    public async Task<T> ExecuteWithStrategyAsync<T>(Func<CancellationToken, Task<T>> operation, CancellationToken cancellationToken = default)
+    public async Task<Result<T, TError>> ExecuteWithStrategyAsync<T, TError>(
+        Func<CancellationToken, Task<Result<T, TError>>> operation,
+        CancellationToken cancellationToken = default
+    )
+        where TError : IError
+    {
+        var strategy = _dbContext.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(async ct =>
+        {
+            await BeginTransactionAsync(ct);
+
+            try
+            {
+                return await operation(ct);
+            }
+            catch
+            {
+                await RollbackTransactionAsync(ct);
+                throw;
+            }
+        }, cancellationToken);
+    }
+
+    public async Task<Result<TError>> ExecuteWithStrategyAsync<TError>(
+        Func<CancellationToken, Task<Result<TError>>> operation,
+        CancellationToken cancellationToken = default
+    )
+        where TError : IError
     {
         var strategy = _dbContext.Database.CreateExecutionStrategy();
         return await strategy.ExecuteAsync(async ct =>
