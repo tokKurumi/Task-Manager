@@ -12,13 +12,10 @@ public interface ITaskCommentData
 
 public sealed class TaskComment : IDomainModel<ITaskCommentData, TaskComment>
 {
-    private readonly List<IDomainEvent> _domainEvents = [];
-
     public Guid Id { get; init; }
     public Guid AuthorId { get; init; }
     public string Message { get; init; }
     public DateTimeOffset Timestamp { get; init; }
-    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private TaskComment(User author, string message, DateTimeOffset timestamp)
     {

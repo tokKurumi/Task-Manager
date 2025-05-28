@@ -29,6 +29,7 @@ public static class DependencyInjection
     private static IHostApplicationBuilder AddServices(this IHostApplicationBuilder builder)
     {
         builder.Services.AddScoped<ITaskApplicationService, TaskApplicationService>();
+        builder.Services.AddScoped<IUserApplicationService, UserApplicationService>();
 
         return builder;
     }

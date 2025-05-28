@@ -17,6 +17,7 @@
   </Folder>
   <Project Path="Task Manager.AppHost/Task Manager.AppHost.csproj" />
   <Project Path="Task Manager.Common/Task Manager.Common.csproj" />
+  <Project Path="Task Manager.Contracts/Task Manager.Contracts.csproj" Id="07c8ead2-782d-4689-9322-57655dfed110" />
   <Project Path="Task Manager.Integrations/Task Manager.Integrations.csproj" Id="9f3f4c45-1ca5-47c4-a367-3205f2c010cf" />
   <Project Path="Task Manager.ServiceDefaults/Task Manager.ServiceDefaults.csproj" />
 </Solution>

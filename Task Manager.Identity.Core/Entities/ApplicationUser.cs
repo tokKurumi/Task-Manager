@@ -10,15 +10,12 @@ public interface IUserData
     DateTimeOffset CreatedAt { get; }
 }
 
-public sealed class ApplicationUser : IDomainModel
+public sealed class ApplicationUser
 {
-    private readonly List<IDomainEvent> _domainEvents = [];
-
     public Guid Id { get; init; }
     public string Email { get; init; }
     public string DisplayName { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
-    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private ApplicationUser(string email, string displayName, DateTimeOffset createdAt)
     {
@@ -49,7 +46,6 @@ public sealed class ApplicationUser : IDomainModel
         }
 
         var user = new ApplicationUser(email, displayName, timeProvider.GetUtcNow());
-        user._domainEvents.Add(new UserCreateDomainEvent(user.Id, user.Email, user.DisplayName, user.CreatedAt));
 
         return user;
     }
@@ -75,7 +71,3 @@ public abstract record CreateApplicationUserError : IError;
 public sealed record EmptyEmailError : CreateApplicationUserError;
 
 public sealed record EmptyDisplayNameError : CreateApplicationUserError;
-
-public sealed record EmptyPasswordHashError : CreateApplicationUserError;
-
-public sealed record UserCreateDomainEvent(Guid Id, string Email, string DisplayName, DateTimeOffset CreatedAt) : IDomainEvent;

@@ -14,7 +14,6 @@ public interface ITaskItemData
 
 public sealed class TaskItem : IDomainModel<ITaskItemData, TaskItem>, IAggregateRoot
 {
-    private readonly List<IDomainEvent> _domainEvents = [];
     private readonly Dictionary<Guid, TaskComment> _comments = [];
 
     public Guid Id { get; init; }
@@ -24,7 +23,6 @@ public sealed class TaskItem : IDomainModel<ITaskItemData, TaskItem>, IAggregate
     public string Notes { get; private set; }
     public TaskItemStatus Status { get; init; }
     public IReadOnlyCollection<TaskComment> Comments => _comments.Values;
-    public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private TaskItem(User user, string title, string description, string notes, TaskItemStatus status)
     {

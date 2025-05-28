@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Task Manager.Contracts\Task Manager.Contracts.csproj" />
     <ProjectReference Include="..\Task Manager.Identity.Core\Task Manager.Identity.Core.csproj" />
   </ItemGroup>
 

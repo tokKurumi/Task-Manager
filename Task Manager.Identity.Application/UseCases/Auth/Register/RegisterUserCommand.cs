@@ -18,10 +18,7 @@ public sealed record RegisterUserResponse(
     string RefreshToken,
     DateTimeOffset IssuedAt,
     TimeSpan ExpiresIn
-) : IDomainEventResponse
-{
-    public IReadOnlyList<IDomainEvent> DomainEvents => User.DomainEvents;
-};
+);
 
 public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
 {

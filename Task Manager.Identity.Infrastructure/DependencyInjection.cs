@@ -65,7 +65,7 @@ public static class DependencyInjection
     {
         builder.AddMassTransitRabbitMq(Integrations.MessageBroker.RabbitMQ);
 
-        builder.Services.AddScoped<IDomainEventPublisher, RabbitMqDomainEventPublisher>();
+        builder.Services.AddScoped<IIntegrationEventPublisher, RabbitMqIntegrationEventPublisher>();
 
         return builder;
     }
